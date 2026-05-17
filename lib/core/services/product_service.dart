@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/core/models/product.dart';
-import 'package:mega_cart/core/services/session_manager.dart';
+import 'package:mega_cart/core/models/create_product_request.dart';
 
 class ProductService {
   final Dio _dio = Dio();
@@ -20,11 +20,8 @@ class ProductService {
     int pageSize = 10,
   }) async {
     try {
-      // Get token from session
-      final token = await SessionManager.getToken();
       final headers = <String, String>{'Content-Type': 'application/json'};
 
-      // تجهيز البيانات تماماً كما في Postman
       final body = jsonEncode({
         'searchTerm': searchTerm,
         'category': category,
@@ -39,7 +36,11 @@ class ProductService {
 
       final response = await _dio.request(
         '${ApiConstans.baseUrl}${ApiConstans.products}',
-        options: Options(method: 'GET', headers: headers),
+        options: Options(
+          method: 'GET',
+          headers: headers,
+          contentType: Headers.jsonContentType,
+        ),
         data: body,
       );
 
@@ -58,6 +59,37 @@ class ProductService {
       );
     } catch (e) {
       throw Exception('Error fetching products: $e');
+    }
+  }
+
+  Future<Product> createProduct(CreateProductRequest request) async {
+    try {
+      final headers = <String, String>{'Content-Type': 'application/json'};
+
+      final response = await _dio.post(
+        '${ApiConstans.baseUrl}${ApiConstans.products}',
+        options: Options(
+          headers: headers,
+          contentType: Headers.jsonContentType,
+        ),
+        data: jsonEncode(request.toJson()),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('Product created successfully: ${response.data}');
+        return Product.fromJson(response.data);
+      } else {
+        throw Exception('Failed to create product');
+      }
+    } on DioException catch (e) {
+      debugPrint('DioException: ${e.toString()}');
+      debugPrint('Response data: ${e.response?.data}');
+      debugPrint('Response status: ${e.response?.statusCode}');
+      throw Exception(
+        'Error creating product: ${e.response?.data ?? e.message}',
+      );
+    } catch (e) {
+      throw Exception('Error creating product: $e');
     }
   }
 }

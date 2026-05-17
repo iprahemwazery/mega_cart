@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/core/app_router.dart';
+import 'package:mega_cart/core/customs/snackbar.dart';
 import 'package:mega_cart/core/services/session_manager.dart';
 import 'package:mega_cart/features/auth/widget/text_field.dart';
 
@@ -29,7 +30,7 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Future<void> _loginUser() async {
-    if (!_formKey.currentState!.validate()) {
+    if (_formKey.currentState?.validate() != true) {
       return;
     }
 
@@ -53,12 +54,16 @@ class _LoginViewState extends State<LoginView> {
       debugPrint('login response: ${response.statusCode} ${response.data}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // Extract token from response - adjust based on actual API response structure
-        final token =
-            response.data['token'] ??
-            response.data['accessToken'] ??
-            response.data['authToken'] ??
-            'dummy_token';
+        final data = response.data;
+        String token = 'dummy_token';
+        if (data is Map) {
+          token =
+              data['token'] ??
+              data['accessToken'] ??
+              data['authToken'] ??
+              'dummy_token';
+        }
+
         await SessionManager.setLoggedIn(token, _emailController.text.trim());
 
         Get.snackbar(

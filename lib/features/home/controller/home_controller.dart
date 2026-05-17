@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:mega_cart/core/app_router.dart';
 import 'package:mega_cart/core/models/product.dart';
 import 'package:mega_cart/core/services/product_service.dart';
 import 'package:mega_cart/core/services/session_manager.dart';
@@ -15,6 +14,7 @@ class HomeController extends GetxController {
   final RxString userEmail = ''.obs;
   final RxBool hasError = false.obs;
   final RxString errorMessage = ''.obs;
+  final RxString userName = ''.obs;
 
   @override
   void onInit() {
@@ -27,6 +27,7 @@ class HomeController extends GetxController {
     try {
       final email = await SessionManager.getUserEmail();
       userEmail.value = email ?? '';
+      userName.value = email != null ? email.split('@')[0] : '';
     } catch (e) {
       debugPrint('Error loading user data: $e');
       userEmail.value = '';
@@ -72,10 +73,5 @@ class HomeController extends GetxController {
       isLoading.value = false;
       isLoadingMore.value = false;
     }
-  }
-
-  Future<void> logout() async {
-    await SessionManager.setLoggedOut();
-    Get.offAllNamed(AppRoutes.login);
   }
 }

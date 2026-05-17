@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mega_cart/core/models/product.dart';
+import 'package:mega_cart/core/app_router.dart';
 import 'package:mega_cart/features/home/controller/home_controller.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:mega_cart/features/home/widget/product_card.dart';
 
+// تم نقل ProductCard إلى ملف lib/features/home/widget/product_card.dart
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
@@ -12,15 +13,15 @@ class HomeView extends StatelessWidget {
     final controller = Get.put(HomeController());
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mega Cart'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: controller.logout,
-          ),
-        ],
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'home_add_product_fab',
+        onPressed: () {
+          Get.toNamed(AppRoutes.createProduct);
+        },
+        child: const Icon(Icons.add),
+        tooltip: 'إضافة منتج جديد',
       ),
+      appBar: AppBar(title: const Text('Mega Cart'), centerTitle: true),
       body: Obx(() {
         if (controller.isLoading.value && controller.products.isEmpty) {
           return const Center(child: CircularProgressIndicator());
@@ -103,7 +104,14 @@ class HomeView extends StatelessWidget {
                     }
 
                     final product = controller.products[index];
-                    return ProductCard(product: product);
+                    return GestureDetector(
+                      onTap: () => Get.toNamed(
+                        AppRoutes
+                            .productDetails, // تأكد من تسمية المسار في AppRoutes
+                        arguments: product.id,
+                      ),
+                      child: ProductCard(product: product),
+                    );
                   },
                 ),
               ),
@@ -111,123 +119,6 @@ class HomeView extends StatelessWidget {
           ],
         );
       }),
-    );
-  }
-}
-
-class ProductCard extends StatelessWidget {
-  final Product product;
-
-  const ProductCard({super.key, required this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Product image
-          Expanded(
-            flex: 3,
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(12),
-              ),
-              child: CachedNetworkImage(
-                imageUrl: product.coverPictureUrl,
-                fit: BoxFit.cover,
-                width: double.infinity,
-                placeholder: (context, url) => Container(
-                  color: Colors.grey[200],
-                  child: const Center(child: CircularProgressIndicator()),
-                ),
-                errorWidget: (context, url, error) => Container(
-                  color: Colors.grey[200],
-                  child: const Icon(Icons.image_not_supported, size: 50),
-                ),
-              ),
-            ),
-          ),
-
-          // Product info
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Product name
-                    Text(
-                      product.name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    // Rating and reviews
-                    Row(
-                      children: [
-                        const Icon(Icons.star, color: Colors.amber, size: 16),
-                        Text(
-                          '${product.rating.toStringAsFixed(1)}',
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                        Text(
-                          ' (${product.reviewsCount})',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    // Price
-                    Row(
-                      children: [
-                        Text(
-                          '\$${product.price.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green,
-                          ),
-                        ),
-                        if (product.discountPercentage > 0) ...[
-                          const SizedBox(width: 8),
-                          Text(
-                            '\$${(product.price / (1 - product.discountPercentage / 100)).toStringAsFixed(2)}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                              decoration: TextDecoration.lineThrough,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    // Stock status
-                    Text(
-                      product.stock > 0 ? 'In Stock' : 'Out of Stock',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: product.stock > 0 ? Colors.green : Colors.red,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

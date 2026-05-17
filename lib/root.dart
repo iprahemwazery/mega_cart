@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mega_cart/features/home/view/home_view.dart';
+import 'package:mega_cart/features/favorites/view/favorit_view.dart';
+import 'package:mega_cart/features/cart/view/cart_view.dart';
+import 'package:mega_cart/features/profile/view/profiel_view.dart';
 
 class Root extends StatefulWidget {
   const Root({super.key});
@@ -15,9 +18,9 @@ class _RootState extends State<Root> {
   final List<Widget> _pages = [
     const HomeView(),
     const Center(child: Text('الطلبات', style: TextStyle(fontSize: 24))),
-    const Center(child: Text('السلة', style: TextStyle(fontSize: 24))),
-    const Center(child: Text('المفضلة', style: TextStyle(fontSize: 24))),
-    const Center(child: Text('الملف الشخصي', style: TextStyle(fontSize: 24))),
+    const CartView(),
+    const FavoritView(),
+    const ProfileView(),
   ];
 
   @override

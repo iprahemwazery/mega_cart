@@ -32,7 +32,7 @@ class _SingupViewState extends State<SingupView> {
   }
 
   Future<void> _registerUser() async {
-    if (!_formKey.currentState!.validate()) {
+    if (_formKey.currentState?.validate() != true) {
       return;
     }
 

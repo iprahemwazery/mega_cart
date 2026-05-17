@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/core/app_router.dart';
+import 'package:mega_cart/core/customs/snackbar.dart';
 import 'package:mega_cart/core/services/session_manager.dart';
 import 'package:mega_cart/features/auth/widget/text_field.dart';
 
@@ -39,7 +40,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
   }
 
   Future<void> _verifyEmail() async {
-    if (!_formKey.currentState!.validate()) {
+    if (_formKey.currentState?.validate() != true) {
       return;
     }
 
@@ -65,9 +66,12 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // Assuming the response contains a token after verification
-        final token =
-            response.data['token'] ?? 'dummy_token_after_verification';
+        final data = response.data;
+        String token = 'dummy_token_after_verification';
+        if (data is Map) {
+          token = data['token'] ?? 'dummy_token_after_verification';
+        }
+
         await SessionManager.setLoggedIn(token, _emailController.text.trim());
 
         Get.snackbar(

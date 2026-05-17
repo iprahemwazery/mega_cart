@@ -21,9 +21,12 @@ class _SplashScreenViewState extends State<SplashScreenView> {
     await Future.delayed(const Duration(seconds: 2)); // Simulate loading time
 
     final isLoggedIn = await SessionManager.isLoggedIn();
+    debugPrint('SplashScreen: isLoggedIn = $isLoggedIn');
     if (isLoggedIn) {
+      debugPrint('SplashScreen: Navigating to root');
       Get.offAllNamed(AppRoutes.root);
     } else {
+      debugPrint('SplashScreen: Navigating to login');
       Get.offAllNamed(AppRoutes.login);
     }
   }

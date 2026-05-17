@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart'; // لاستخدام Get.snackbar
 import 'package:dio/dio.dart'; // لتهيئة Dio
 import 'package:mega_cart/core/NetWork/add_product_cubit.dart';
 import 'package:mega_cart/core/customs/snackbar.dart';

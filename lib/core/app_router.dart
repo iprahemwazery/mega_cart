@@ -4,6 +4,7 @@ import 'package:mega_cart/features/auth/signup/view/singup_view.dart';
 import 'package:mega_cart/features/auth/verify_email/view/verify_email_view.dart';
 import 'package:mega_cart/features/createProduct/view/create_product_view.dart';
 import 'package:mega_cart/features/home/view/home_view.dart';
+import 'package:mega_cart/features/settings/view/sttings_view.dart';
 import 'package:mega_cart/features/splashScreen/view/splash_screen_view.dart';
 import 'package:mega_cart/root.dart';
 import 'package:mega_cart/features/singelProfuct/view/product_details_view.dart';
@@ -39,6 +40,10 @@ class AppPages {
     GetPage(name: AppRoutes.root, page: () => const Root()),
     GetPage(name: AppRoutes.detail, page: () => const ProductDetailsView()),
     GetPage(name: AppRoutes.createProduct, page: () => CreateProductView()),
-    GetPage(name: AppRoutes.productDetails, page: () => ProductDetailsView()),
+    GetPage(
+      name: AppRoutes.productDetails,
+      page: () => const ProductDetailsView(),
+    ),
+    GetPage(name: AppRoutes.settings, page: () => const SttingsView()),
   ];
 }

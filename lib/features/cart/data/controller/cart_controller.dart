@@ -1,62 +1,208 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/core/customs/snackbar.dart';
+import 'package:mega_cart/core/services/session_manager.dart';
 import 'package:mega_cart/core/models/product.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert'; // For jsonEncode and jsonDecode
+import 'package:mega_cart/core/models/cart_model.dart';
 
 class CartController extends GetxController {
-  static const _cartKey = 'cartProducts';
+  // تهيئة مكتبة Dio
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: ApiConstans.baseUrl,
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+      headers: {'Accept': 'application/json'},
+    ),
+  );
 
-  // قائمة المنتجات في السلة (Reactive list)
-  var cartProducts = <Product>[].obs;
+  // متغيرات مراقبة الحالة (Reactive Variables)
+  final Rxn<CartModel> cartData = Rxn<CartModel>();
+  final RxBool isLoading = false.obs;
+  final RxString errorMessage = ''.obs;
 
-  // Computed property للتحقق من وجود منتج في السلة
-  bool isInCart(String productId) => cartProducts.any((p) => p.id == productId);
+  // تحويل عناصر السلة إلى قائمة منتجات لتعرض في الـ GridView
+  List<Product> get cartProducts =>
+      cartData.value?.items.map((item) {
+        return Product(
+          id: item.productId,
+          name: item.productName,
+          price: item.price,
+          coverPictureUrl: item.productImage ?? '',
+          description: '',
+          stock: 10, // قيم افتراضية لأن السلة لا تعيد كامل بيانات المنتج
+          rating: 0,
+          reviewsCount: 0,
+          color: '',
+          weight: 0,
+          discountPercentage: 0,
+          productCode: '',
+          arabicName: '',
+          arabicDescription: '',
+          productPictures: [],
+          sellerId: '',
+          categories: [],
+        );
+      }).toList() ??
+      [];
 
   @override
   void onInit() {
     super.onInit();
-    loadCart();
-    // Listen for changes and save
-    ever(cartProducts, (_) => saveCart());
+    refreshCart();
   }
 
-  Future<void> loadCart() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? cartJson = prefs.getString(_cartKey);
-    if (cartJson != null) {
-      final List<dynamic> decodedData = jsonDecode(cartJson);
-      cartProducts.assignAll(
-        decodedData
-            .map((item) => Product.fromJson(item as Map<String, dynamic>))
-            .toList(),
-      );
+  // دالة لتحديث السلة (تُستدعى عند فتح الشاشة)
+  Future<void> refreshCart() async {
+    debugPrint('--- Refreshing Cart Data ---');
+    getCart(); // جلب السلة تلقائياً عند تشغيل الكنترولر
+  }
+
+  // دالة مساعدة لجلب إعدادات الطلب (التوكن)
+  Future<Options> _getOptions() async {
+    final token = await SessionManager.getToken();
+    return Options(
+      headers: {
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      },
+    );
+  }
+
+  // 1. دالة الـ GET (جلب محتويات السلة)
+  Future<void> getCart() async {
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+
+      final response = await _dio.get('cart', options: await _getOptions());
+
+      debugPrint('--- GET Cart Success ---');
+      debugPrint('Response: ${response.data}');
+
+      if (response.data != null) {
+        cartData.value = CartModel.fromJson(
+          response.data as Map<String, dynamic>,
+        );
+      }
+    } catch (e) {
+      _handleError(e, "Get Cart");
+    } finally {
+      isLoading.value = false;
     }
   }
 
-  Future<void> saveCart() async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<Map<String, dynamic>> jsonList = cartProducts
-        .map((product) => product.toJson())
-        .toList();
-    await prefs.setString(_cartKey, jsonEncode(jsonList));
+  // 2. دالة الـ POST (إضافة منتج للسلة)
+  Future<void> addToCart(String productId, {int quantity = 1}) async {
+    try {
+      isLoading.value = true;
+
+      final Map<String, dynamic> data = {
+        "productId": productId,
+        "quantity": quantity,
+      };
+
+      debugPrint('--- POST AddToCart Request ---');
+      debugPrint('Payload: $data');
+
+      final response = await _dio.post(
+        'cart/items',
+        data: data,
+        options: await _getOptions(),
+      );
+
+      debugPrint('--- POST AddToCart Success ---');
+      debugPrint('Status Code: ${response.statusCode}');
+
+      // بعد الإضافة الناجحة، نقوم بتحديث بيانات السلة
+      await getCart();
+
+      GlassSnackbar.show(message: 'تم إضافة المنتج إلى السلة بنجاح');
+    } catch (e) {
+      _handleError(e, "Add To Cart");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  void toggleCart(Product product) {
+  // 3. حذف عنصر من السلة باستخدام الـ cartItemId
+  Future<void> deleteCartItem(String cartItemId) async {
+    try {
+      isLoading.value = true;
+      await _dio.delete('cart/items/$cartItemId', options: await _getOptions());
+      await getCart();
+    } catch (e) {
+      _handleError(e, "Delete Item");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // 4. دالة التحقق هل المنتج موجود في السلة
+  bool isInCart(String productId) {
+    return cartData.value?.items.any((item) => item.productId == productId) ??
+        false;
+  }
+
+  // 5. دالة التبديل (إضافة أو حذف) المستخدمة في صفحة التفاصيل
+  Future<void> toggleCart(Product product) async {
     if (isInCart(product.id)) {
-      cartProducts.removeWhere((p) => p.id == product.id);
-      GlassSnackbar.show(
-        message: 'تمت إزالة ${product.name} من السلة',
-        isError: true,
+      // البحث عن الـ cartItemId المرتبط بهذا المنتج لحذفه
+      final item = cartData.value?.items.firstWhere(
+        (element) => element.productId == product.id,
       );
+      if (item != null) {
+        await deleteCartItem(item.id);
+      }
     } else {
-      cartProducts.add(product);
-      GlassSnackbar.show(message: 'تمت إضافة ${product.name} إلى السلة');
+      await addToCart(product.id);
     }
   }
 
+  // 6. مسح السلة بالكامل
   Future<void> clearCart() async {
-    cartProducts.clear();
-    GlassSnackbar.show(message: 'تم مسح السلة بالكامل', isError: true);
+    try {
+      isLoading.value = true;
+      // إذا كان الـ API لا يدعم مسح الكل، نقوم بحذف العناصر واحداً تلو الآخر
+      if (cartData.value != null) {
+        for (var item in cartData.value!.items) {
+          await _dio.delete(
+            'cart/items/${item.id}',
+            options: await _getOptions(),
+          );
+        }
+        await getCart();
+        GlassSnackbar.show(message: 'تم مسح السلة بالكامل');
+      }
+    } catch (e) {
+      _handleError(e, "Clear Cart");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // دالة احترافية لإدارة الأخطاء وطباعتها
+  void _handleError(dynamic e, String methodName) {
+    debugPrint('--- Error in $methodName ---');
+
+    if (e is DioException) {
+      final res = e.response;
+      debugPrint('Status Code: ${res?.statusCode}');
+      debugPrint('Error Data: ${res?.data}');
+      debugPrint('Dio Message: ${e.message}');
+
+      errorMessage.value =
+          res?.data?['message'] ?? e.message ?? 'حدث خطأ غير متوقع';
+    } else {
+      debugPrint('Unknown Error: $e');
+      errorMessage.value = e.toString();
+    }
+
+    GlassSnackbar.show(
+      message: 'حدث خطأ: ${errorMessage.value}',
+      isError: true,
+    );
   }
 }

@@ -57,23 +57,23 @@ class HomeView extends StatelessWidget {
         return Column(
           children: [
             // User info
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: Colors.blue.shade50,
-              child: Row(
-                children: [
-                  const Icon(Icons.person, color: Colors.blue),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Welcome back, ${controller.userEmail.value}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Container(
+            //   padding: const EdgeInsets.all(16),
+            //   color: Colors.blue.shade50,
+            //   child: Row(
+            //     children: [
+            //       const Icon(Icons.person, color: Colors.blue),
+            //       const SizedBox(width: 8),
+            //       Text(
+            //         'Welcome back, ${controller.userEmail.value}',
+            //         style: const TextStyle(
+            //           fontSize: 16,
+            //           fontWeight: FontWeight.w500,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
 
             // Products grid
             Expanded(

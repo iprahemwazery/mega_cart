@@ -1,8 +1,6 @@
 import 'package:dartz/dartz.dart';
-import 'package:mega_cart/core/NetWork/api_service.dart';
 import 'package:mega_cart/core/NetWork/failure.dart';
 import 'package:mega_cart/core/models/product.dart';
-import 'package:mega_cart/core/models/create_product_request.dart';
 
 abstract class ProductRepository {
   Future<Either<Failure, Product>> getProductDetails(String id);

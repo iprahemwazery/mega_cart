@@ -4,12 +4,15 @@ import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
+import 'package:mega_cart/core/app_router.dart';
 import 'package:mega_cart/core/customs/snackbar.dart';
 import 'package:mega_cart/features/home/controller/home_controller.dart';
+import 'package:mega_cart/features/profile/data/profile_conttroller.dart';
 import 'package:mega_cart/features/profile/widget/profile_cubit.dart';
 import 'package:mega_cart/features/profile/widget/profile_state.dart';
 import 'package:mega_cart/features/profile/widget/user_remote_data_source.dart';
 import 'package:mega_cart/features/profile/widget/user_repository_impl.dart';
+import 'package:mega_cart/features/settings/view/sttings_view.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -195,8 +198,31 @@ class ProfileView extends StatelessWidget {
             icon: Icons.settings,
             title: 'الإعدادات',
             onTap: () {
-              GlassSnackbar.show(message: 'سيتم فتح صفحة الإعدادات');
-              // TODO: Navigate to Settings page
+              Get.bottomSheet(
+                // Wrap SttingsView with a Container to give it a background color
+                // and then apply the shape to the Get.bottomSheet itself.
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      context,
+                    ).scaffoldBackgroundColor, // Background color for the sheet content
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(25.0),
+                    ),
+                  ),
+
+                  child: const SttingsView(),
+                ),
+                isScrollControlled:
+                    true, // Allows the bottom sheet to take full height if needed
+                backgroundColor:
+                    Colors.transparent, // Important for rounded corners to show
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(25.0),
+                  ),
+                ),
+              );
             },
           ),
           _buildActionCard(
@@ -230,7 +256,7 @@ class ProfileView extends StatelessWidget {
                 textCancel: 'إلغاء',
                 confirmTextColor: Colors.white,
                 onConfirm: () {
-                  Get.back(); // Close dialog
+                  ProfileConttroller().logout();
                   GlassSnackbar.show(message: 'تم تسجيل الخروج بنجاح');
                   // TODO: Implement actual logout logic and navigate to login screen
                 },

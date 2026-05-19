@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:mega_cart/core/models/product.dart';
 import 'package:mega_cart/core/services/product_service.dart';
-import 'package:mega_cart/core/services/session_manager.dart';
+import 'package:mega_cart/features/splashScreen/view/session_manager.dart';
 
 class HomeController extends GetxController {
   final ProductService _productService = ProductService();
@@ -15,6 +15,7 @@ class HomeController extends GetxController {
   final RxBool hasError = false.obs;
   final RxString errorMessage = ''.obs;
   final RxString userName = ''.obs;
+  final RxBool showCategories = false.obs;
 
   @override
   void onInit() {

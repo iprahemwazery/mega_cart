@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/core/customs/snackbar.dart';
-import 'package:mega_cart/core/services/session_manager.dart';
+import 'package:mega_cart/features/splashScreen/view/session_manager.dart';
 import 'package:mega_cart/core/models/product.dart';
 import 'package:mega_cart/core/models/cart_model.dart';
 
@@ -48,6 +48,14 @@ class CartController extends GetxController {
         );
       }).toList() ??
       [];
+
+  // جلب إجمالي السعر لكل العناصر في السلة
+  double get totalCartPrice =>
+      cartData.value?.items.fold(
+        0,
+        (sum, item) => sum! + (item.price * item.quantity),
+      ) ??
+      0.0;
 
   @override
   void onInit() {
@@ -147,7 +155,7 @@ class CartController extends GetxController {
   }
 
   // 5. دالة التبديل (إضافة أو حذف) المستخدمة في صفحة التفاصيل
-  Future<void> toggleCart(Product product) async {
+  Future<void> toggleCart(Product product, {int quantity = 1}) async {
     if (isInCart(product.id)) {
       // البحث عن الـ cartItemId المرتبط بهذا المنتج لحذفه
       final item = cartData.value?.items.firstWhere(
@@ -157,7 +165,7 @@ class CartController extends GetxController {
         await deleteCartItem(item.id);
       }
     } else {
-      await addToCart(product.id);
+      await addToCart(product.id, quantity: quantity);
     }
   }
 

@@ -21,6 +21,7 @@ class ProductDetailsView extends StatefulWidget {
 class _ProductDetailsViewState extends State<ProductDetailsView> {
   late final FavoritesController favoritesController;
   late final CartController cartController;
+  int _quantity = 1; // متغير للتحكم في الكمية
 
   @override
   void initState() {
@@ -204,6 +205,52 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 20),
+                  // اختيار الكمية
+                  const Text(
+                    'الكمية',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      _buildQuantityButton(
+                        icon: Icons.remove,
+                        onPressed: () {
+                          if (_quantity > 1) {
+                            setState(() {
+                              _quantity--;
+                            });
+                          }
+                        },
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          '$_quantity',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      _buildQuantityButton(
+                        icon: Icons.add,
+                        onPressed: () {
+                          if (_quantity < product.stock) {
+                            setState(() {
+                              _quantity++;
+                            });
+                          } else {
+                            Get.snackbar(
+                              'تنبيه',
+                              'لقد وصلت للحد الأقصى للمخزون',
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 25),
                   // الوصف
                   const Text(
@@ -232,6 +279,23 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
     return const SizedBox.shrink();
   }
 
+  Widget _buildQuantityButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: IconButton(
+        icon: Icon(icon, color: Colors.black),
+        onPressed: onPressed,
+        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+      ),
+    );
+  }
+
   Widget _buildBottomNavigationBar(ProductDetailsState state) {
     if (state is! ProductDetailsSuccess) {
       return const SizedBox.shrink();
@@ -239,24 +303,64 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
 
     final product = state.product;
 
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).primaryColor,
-          minimumSize: const Size(double.infinity, 55),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 10,
+            offset: const Offset(0, -3),
           ),
+        ],
+      ),
+      child: SafeArea(
+        child: Row(
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'إجمالي السعر',
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+                Text(
+                  '\$${(product.price * _quantity).toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 25),
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+                onPressed: () =>
+                    cartController.toggleCart(product, quantity: _quantity),
+                child: Obx(() {
+                  final isInCart = cartController.isInCart(product.id);
+                  return Text(
+                    isInCart ? 'إزالة من السلة' : 'أضف إلى السلة',
+                    style: const TextStyle(fontSize: 18, color: Colors.white),
+                  );
+                }),
+              ),
+            ),
+          ],
         ),
-        onPressed: () => cartController.toggleCart(product),
-        child: Obx(() {
-          final isInCart = cartController.isInCart(product.id);
-          return Text(
-            isInCart ? 'إزالة من السلة' : 'أضف إلى السلة',
-            style: const TextStyle(fontSize: 18, color: Colors.white),
-          );
-        }),
       ),
     );
   }

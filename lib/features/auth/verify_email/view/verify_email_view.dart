@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/core/app_router.dart';
 import 'package:mega_cart/core/customs/snackbar.dart';
-import 'package:mega_cart/core/services/session_manager.dart';
+import 'package:mega_cart/features/splashScreen/view/session_manager.dart';
 import 'package:mega_cart/features/auth/widget/text_field.dart';
 
 class VerifyEmailView extends StatefulWidget {

@@ -16,12 +16,20 @@ class HomeController extends GetxController {
   final RxString errorMessage = ''.obs;
   final RxString userName = ''.obs;
   final RxBool showCategories = false.obs;
+  final RxBool isSearchOverlayVisible = false.obs;
+  final RxString searchTerm = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
     loadUserData();
     loadProducts();
+    // إضافة debounce للانتظار 500ms بعد توقف الكتابة قبل تنفيذ البحث فعلياً
+    debounce(
+      searchTerm,
+      (_) => loadProducts(),
+      time: const Duration(milliseconds: 500),
+    );
   }
 
   Future<void> loadUserData() async {
@@ -50,6 +58,7 @@ class HomeController extends GetxController {
 
     try {
       final response = await _productService.getProducts(
+        searchTerm: searchTerm.value,
         page: loadMore ? currentPage.value + 1 : 1,
         pageSize: 100,
       );
@@ -61,7 +70,7 @@ class HomeController extends GetxController {
         products.assignAll(response.items);
       }
 
-      hasNextPage.value = response.hasNextPage;
+      hasNextPage.value = response.hasNextPage ?? false;
       debugPrint(
         'HomeController - Products count: ${products.length}, Has next page: ${hasNextPage.value}',
       );

@@ -9,12 +9,18 @@ class HomeHeader extends StatefulWidget {
   final VoidCallback onHomePressed;
   final VoidCallback onCategoryPressed;
   final bool showCategories; // To highlight the active button
+  final Function(String)? onSearchChanged; // Callback للبحث
+  final Function(bool)? onSearchModeChanged; // إخبار الأب بحالة البحث
+  final bool isSearching; // بارامتر جديد للتحكم من الخارج
   const HomeHeader({
     super.key,
     required this.userEmail,
     required this.onHomePressed,
     required this.onCategoryPressed,
     required this.showCategories,
+    required this.isSearching,
+    this.onSearchChanged,
+    this.onSearchModeChanged,
   });
 
   @override
@@ -22,31 +28,41 @@ class HomeHeader extends StatefulWidget {
 }
 
 class _HomeHeaderState extends State<HomeHeader> {
-  // PageController لإدارة الـ PageView
   late PageController _pageController;
-
-  // متغير لمراقبة الصفحة الحالية (يمكن أن يكون RxInt إذا كان الـ Header ويدجت تفاعلي)
-  // بما أنه StatelessWidget، سنستخدمه فقط لتحديث مؤشر الصفحات
-  final RxInt _currentPage = 0.obs; // هذا المتغير خاص بالـ PageView فقط
+  late TextEditingController _searchController;
+  late FocusNode _searchFocusNode;
+  final RxInt _currentPage = 0.obs;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentPage.value);
+    _searchController = TextEditingController();
+    _searchFocusNode = FocusNode();
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeHeader oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // إذا تم إغلاق البحث من الخارج، قم بمسح نص البحث
+    if (oldWidget.isSearching && !widget.isSearching) {
+      _searchController.clear();
+    }
   }
 
   @override
   void dispose() {
     _pageController.dispose();
+    _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
-  // دالة بسيطة لاستخراج اسم المستخدم من البريد الإلكتروني
   String get userNameDisplay {
     if (widget.userEmail.contains('@')) {
       return widget.userEmail.split('@').first;
     }
-    return widget.userEmail; // إذا لم يكن هناك @، نعرض البريد كاملاً
+    return widget.userEmail;
   }
 
   @override
@@ -63,77 +79,115 @@ class _HomeHeaderState extends State<HomeHeader> {
         // لضمان عدم تداخل المحتوى مع شريط الحالة (status bar)
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // الجانب الأيسر: صورة المستخدم، الاسم، البريد الإلكتروني
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 16, // تقليل حجم الصورة الشخصية
-                      backgroundColor:
-                          Colors.blue.shade200, // لون خلفية الأيقونة
-                      child: const Icon(
-                        Icons.person, // Changed from Image to Icon
-                        color: Colors.white,
-                        size: 20,
+            widget.isSearching
+                ? Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () {
+                          widget.onSearchModeChanged?.call(false);
+                          _searchController.clear();
+                          widget.onSearchChanged?.call('');
+                        },
                       ),
-                    ),
-                    const SizedBox(width: 10), // تقليل المسافة
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          userNameDisplay,
-                          style: const TextStyle(
-                            fontSize: 16, // تقليل حجم خط الاسم
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          focusNode: _searchFocusNode,
+                          autofocus: true,
+                          decoration: InputDecoration(
+                            hintText: 'Search products...',
+                            border: InputBorder.none,
+                            suffixIcon: _searchController.text.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(Icons.clear, size: 20),
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      widget.onSearchChanged?.call('');
+                                      setState(
+                                        () {},
+                                      ); // لتحديث الواجهة وإخفاء الزر
+                                    },
+                                  )
+                                : null,
                           ),
+                          onChanged: (value) {
+                            setState(() {}); // لإظهار زر X عند بدء الكتابة
+                            widget.onSearchChanged?.call(value);
+                          },
                         ),
-                        Text(
-                          widget.userEmail,
-                          style: TextStyle(
-                            // تقليل حجم خط البريد الإلكتروني
-                            fontSize: 12,
-                            color: Colors.grey[600],
+                      ),
+                    ],
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // الجانب الأيسر: صورة المستخدم، الاسم، البريد الإلكتروني
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 16,
+                            backgroundColor: Colors.blue.shade200,
+                            child: const Icon(
+                              Icons.person,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-
-                const Spacer(), // يدفع الأيقونات اليمنى إلى أقصى اليمين
-                // الجانب الأيمن: أيقونات الإشعارات والبحث
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.search,
-                        color: Colors.black87,
-                        size: 24,
-                      ), // تقليل حجم الأيقونة
-                      onPressed: () {
-                        // TODO: إضافة منطق التنقل إلى شاشة البحث
-                        Get.snackbar('البحث', 'تم الضغط على زر البحث!');
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.notifications_none,
-                        color: Colors.black87,
-                        size: 24,
-                      ), // تقليل حجم الأيقونة
-                      onPressed: () {
-                        // TODO: إضافة منطق التنقل إلى شاشة الإشعارات
-                        Get.snackbar('الإشعارات', 'تم الضغط على زر الإشعارات!');
-                      },
-                    ),
-                  ],
-                ),
-              ], // توزيع العناصر بشكل متساوٍ
-            ),
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                userNameDisplay,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              Text(
+                                widget.userEmail,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.search,
+                              color: Colors.black87,
+                              size: 24,
+                            ),
+                            onPressed: () {
+                              widget.onSearchModeChanged?.call(true);
+                              _searchFocusNode.requestFocus();
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.notifications_none,
+                              color: Colors.black87,
+                              size: 24,
+                            ),
+                            onPressed: () {
+                              Get.snackbar(
+                                'الإشعارات',
+                                'تم الضغط على زر الإشعارات!',
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
             const SizedBox(height: 30), // تقليل المسافة بين الصفوف
             Row(
               children: [

@@ -34,6 +34,7 @@ class HomeView extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           children: [
+            const SizedBox(height: 8),
             // الهيدر يبقى ثابتاً دائماً ويحدث نفسه فقط عند الحاجة
             Obx(
               () => HomeHeader(
@@ -47,87 +48,43 @@ class HomeView extends StatelessWidget {
                   categoryController.getCategories();
                 },
                 showCategories: homeController.showCategories.value,
+                isSearching: homeController.isSearchOverlayVisible.value,
+                onSearchModeChanged: (isSearching) {
+                  // الآن يتم تحديث المتغير في الكنترولر
+                  homeController.isSearchOverlayVisible.value = isSearching;
+                },
+                onSearchChanged: (value) {
+                  // تحديث نص البحث في الكنترولر واستدعاء وظيفة التحميل
+                  // الـ debounce في الكنترولر سيتكفل باستدعاء loadProducts
+                  homeController.searchTerm.value = value;
+                },
               ),
             ),
             // هذا الجزء هو فقط ما سيتغير ويظهر فيه التحميل
             Expanded(
-              child: Obx(() {
-                // حالة عرض المنتجات
-                if (!homeController.showCategories.value) {
-                  if (homeController.isLoading.value &&
-                      homeController.products.isEmpty) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (homeController.hasError.value &&
-                      homeController.products.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.error_outline,
-                            size: 64,
-                            color: Colors.red,
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'Failed to load products',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            homeController.errorMessage.value,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.grey[600]),
-                          ),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: () => homeController.loadProducts(),
-                            child: const Text('Try Again'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                  return _buildProductsContent(homeController);
-                }
+              child: Stack(
+                children: [
+                  // 1. المحتوى الأساسي (المنتجات أو الأقسام)
+                  Obx(() {
+                    if (!homeController.showCategories.value) {
+                      return _buildProductsContent(homeController);
+                    }
+                    return StaticCategoriesContent();
+                  }),
 
-                // حالة عرض الأقسام
-                if (categoryController.isLoading.value &&
-                    categoryController.categories.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (categoryController.hasError.value &&
-                    categoryController.categories.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.error_outline,
-                          size: 64,
-                          color: Colors.red,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          categoryController.errorMessage.value,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () => categoryController.getCategories(),
-                          child: const Text('Try Again'),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-                return StaticCategoriesContent();
-              }),
+                  // 2. طبقة نتائج البحث (تظهر فوق المحتوى)
+                  Obx(() {
+                    if (homeController.isSearchOverlayVisible.value) {
+                      // استخدام المتغير من الكنترولر
+                      return Container(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        child: _buildSearchResultsOverlay(homeController),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  }),
+                ],
+              ),
             ),
           ],
         ),
@@ -135,8 +92,62 @@ class HomeView extends StatelessWidget {
     );
   }
 
+  // ويدجت منفصل لنتائج البحث تظهر فوق المحتوى
+  Widget _buildSearchResultsOverlay(HomeController homeController) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(
+            'Search Results',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Expanded(
+          child: Obx(() {
+            // الآن هذا الجزء سيحدث نفسه تلقائياً عند انتهاء التحميل أو تغير النتائج
+            if (homeController.isLoading.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (homeController.products.isEmpty) {
+              return const Center(child: Text('No products found.'));
+            }
+            return ListView.builder(
+              itemCount: homeController.products.length,
+              itemBuilder: (context, index) {
+                final product = homeController.products[index];
+                return ListTile(
+                  leading: Image.network(
+                    product.coverPictureUrl,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
+                  title: Text(product.name),
+                  subtitle: Text('\$${product.price}'),
+                  onTap: () {
+                    homeController.isSearchOverlayVisible.value = false;
+                    homeController.searchTerm.value = '';
+                    homeController.loadProducts();
+                    Get.toNamed(AppRoutes.detail, arguments: product.id);
+                  },
+                );
+              },
+            );
+          }),
+        ),
+      ],
+    );
+  }
+
   // ويدجت منفصل لعرض شبكة المنتجات
   Widget _buildProductsContent(HomeController homeController) {
+    // إذا كانت القائمة فارغة والتحميل جارٍ، أظهر مؤشر تحميل مركزي
+    if (homeController.isLoading.value && homeController.products.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Column(
       children: [
         if (!homeController.showCategories.value) ...[

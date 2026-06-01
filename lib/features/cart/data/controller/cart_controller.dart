@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/core/customs/snackbar.dart';
@@ -103,12 +104,12 @@ class CartController extends GetxController {
   }
 
   // 2. دالة الـ POST (إضافة منتج للسلة)
-  Future<void> addToCart(String productId, {int quantity = 1}) async {
+  Future<void> addToCart(Product product, {int quantity = 1}) async {
     try {
       isLoading.value = true;
 
       final Map<String, dynamic> data = {
-        "productId": productId,
+        "productId": product.id,
         "quantity": quantity,
       };
 
@@ -127,7 +128,10 @@ class CartController extends GetxController {
       // بعد الإضافة الناجحة، نقوم بتحديث بيانات السلة
       await getCart();
 
-      GlassSnackbar.show(message: 'تم إضافة المنتج إلى السلة بنجاح');
+      HapticFeedback.mediumImpact();
+      GlassSnackbar.show(
+        message: 'productAddedToCart'.trParams({'productName': product.name}),
+      ); // استخدام .trParams
     } catch (e) {
       _handleError(e, "Add To Cart");
     } finally {
@@ -140,6 +144,7 @@ class CartController extends GetxController {
     try {
       isLoading.value = true;
       await _dio.delete('cart/items/$cartItemId', options: await _getOptions());
+      HapticFeedback.mediumImpact();
       await getCart();
     } catch (e) {
       _handleError(e, "Delete Item");
@@ -165,7 +170,7 @@ class CartController extends GetxController {
         await deleteCartItem(item.id);
       }
     } else {
-      await addToCart(product.id, quantity: quantity);
+      await addToCart(product, quantity: quantity);
     }
   }
 
@@ -181,8 +186,8 @@ class CartController extends GetxController {
             options: await _getOptions(),
           );
         }
-        await getCart();
-        GlassSnackbar.show(message: 'تم مسح السلة بالكامل');
+        await getCart(); // تحديث السلة بعد المسح
+        GlassSnackbar.show(message: 'cartCleared'.tr); // استخدام .tr
       }
     } catch (e) {
       _handleError(e, "Clear Cart");
@@ -209,7 +214,9 @@ class CartController extends GetxController {
     }
 
     GlassSnackbar.show(
-      message: 'حدث خطأ: ${errorMessage.value}',
+      message: 'errorOccurred'.trParams({
+        'errorMessage': errorMessage.value,
+      }), // استخدام .trParams
       isError: true,
     );
   }

@@ -11,6 +11,7 @@ import 'package:mega_cart/features/profile/data/profile_conttroller.dart';
 import 'package:mega_cart/features/profile/widget/profile_cubit.dart';
 import 'package:mega_cart/features/profile/widget/profile_state.dart';
 import 'package:mega_cart/features/profile/widget/user_remote_data_source.dart';
+import 'package:get/get.dart'; // موجود بالفعل
 import 'package:mega_cart/features/profile/widget/user_repository_impl.dart';
 import 'package:mega_cart/features/settings/view/sttings_view.dart';
 
@@ -32,7 +33,7 @@ class ProfileView extends StatelessWidget {
         return ProfileCubit(userRepository)..loadUserProfile(userId);
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('الملف الشخصي'), centerTitle: true),
+        appBar: AppBar(title: Text('profile'.tr), centerTitle: true),
         body: BlocBuilder<ProfileCubit, ProfileState>(
           builder: (context, state) {
             if (state is ProfileLoading) {
@@ -65,7 +66,7 @@ class ProfileView extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'خطأ: ${state.message}',
+                      'error'.trParams({'errorMessage': state.message}),
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontSize: 16),
                     ),
@@ -74,7 +75,7 @@ class ProfileView extends StatelessWidget {
                       onPressed: () {
                         context.read<ProfileCubit>().loadUserProfile(userId);
                       },
-                      child: const Text('إعادة المحاولة'),
+                      child: Text('retry'.tr),
                     ),
                   ],
                 ),
@@ -187,7 +188,7 @@ class ProfileView extends StatelessWidget {
           _buildActionCard(
             context,
             icon: Icons.edit,
-            title: 'تعديل الملف الشخصي',
+            title: 'editProfile'.tr,
             onTap: () {
               GlassSnackbar.show(message: 'سيتم فتح صفحة تعديل الملف الشخصي');
               // TODO: Navigate to Edit Profile page
@@ -196,7 +197,7 @@ class ProfileView extends StatelessWidget {
           _buildActionCard(
             context,
             icon: Icons.settings,
-            title: 'الإعدادات',
+            title: 'settings'.tr,
             onTap: () {
               Get.bottomSheet(
                 // Wrap SttingsView with a Container to give it a background color
@@ -228,7 +229,7 @@ class ProfileView extends StatelessWidget {
           _buildActionCard(
             context,
             icon: Icons.notifications,
-            title: 'الإشعارات',
+            title: 'notifications'.tr,
             onTap: () {
               GlassSnackbar.show(message: 'سيتم فتح صفحة الإشعارات');
               // TODO: Navigate to Notifications page
@@ -237,7 +238,7 @@ class ProfileView extends StatelessWidget {
           _buildActionCard(
             context,
             icon: Icons.help_outline,
-            title: 'المساعدة والدعم',
+            title: 'helpAndSupport'.tr,
             onTap: () {
               GlassSnackbar.show(message: 'سيتم فتح صفحة المساعدة والدعم');
               // TODO: Navigate to Help & Support page
@@ -246,14 +247,14 @@ class ProfileView extends StatelessWidget {
           _buildActionCard(
             context,
             icon: Icons.logout,
-            title: 'تسجيل الخروج',
+            title: 'logout'.tr,
             isDestructive: true,
             onTap: () {
               Get.defaultDialog(
-                title: 'تسجيل الخروج',
-                middleText: 'هل أنت متأكد أنك تريد تسجيل الخروج؟',
-                textConfirm: 'نعم',
-                textCancel: 'إلغاء',
+                title: 'logout'.tr,
+                middleText: 'logoutConfirmation'.tr,
+                textConfirm: 'yes'.tr,
+                textCancel: 'cancel'.tr,
                 confirmTextColor: Colors.white,
                 onConfirm: () {
                   ProfileConttroller().logout();
@@ -294,7 +295,9 @@ class ProfileView extends StatelessWidget {
             // استخدام TextTheme لتوحيد الخطوط
             color: isDestructive
                 ? Theme.of(context).colorScheme.error
-                : Colors.black87,
+                : Theme.of(
+                    context,
+                  ).colorScheme.onSurface, // استخدام لون يتفاعل مع الثيم
           ),
         ),
         trailing: const Icon(

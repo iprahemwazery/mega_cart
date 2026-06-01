@@ -28,11 +28,12 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
   Widget build(BuildContext context) {
     final controller = Get.find<CartController>();
     final orderController = Get.put(OrderController());
+    final theme = Theme.of(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: theme.scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
       ),
       child: Column(
@@ -43,7 +44,7 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
             height: 5,
             width: 50,
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: theme.colorScheme.outlineVariant,
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -52,8 +53,8 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'إتمام الطلب',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                'checkoutTitle'.tr,
+                style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -69,7 +70,7 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
           TextField(
             controller: _addressController,
             decoration: InputDecoration(
-              hintText: 'عنوان التوصيل (بالتفصيل)',
+              hintText: 'shippingAddressHint'.tr,
               prefixIcon: const Icon(Icons.location_on_outlined),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -80,7 +81,7 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                 borderSide: BorderSide(color: Colors.grey[300]!),
               ),
               filled: true,
-              fillColor: Colors.grey[50],
+              fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.2),
             ),
           ),
           const SizedBox(height: 16),
@@ -90,7 +91,7 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
             controller: _cardController,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              hintText: 'رقم البطاقة (اختياري)',
+              hintText: 'cardNumberHint'.tr,
               prefixIcon: const Icon(Icons.payment_outlined),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -101,7 +102,7 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                 borderSide: BorderSide(color: Colors.grey[300]!),
               ),
               filled: true,
-              fillColor: Colors.grey[50],
+              fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.2),
             ),
           ),
           const SizedBox(height: 16),
@@ -110,7 +111,7 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
           TextField(
             controller: _couponController,
             decoration: InputDecoration(
-              hintText: 'كود الخصم (اختياري)',
+              hintText: 'couponCodeHint'.tr,
               prefixIcon: const Icon(Icons.confirmation_number_outlined),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -121,7 +122,7 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                 borderSide: BorderSide(color: Colors.grey[300]!),
               ),
               filled: true,
-              fillColor: Colors.grey[50],
+              fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.2),
             ),
           ),
           const SizedBox(height: 24),
@@ -130,23 +131,23 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
               children: [
                 _buildSummaryRow(
-                  'المجموع الفرعي',
+                  'subtotal'.tr,
                   '\$${controller.totalCartPrice.toStringAsFixed(2)}',
                 ),
                 const SizedBox(height: 8),
-                _buildSummaryRow('رسوم التوصيل', '\$5.00'),
+                _buildSummaryRow('deliveryFee'.tr, '\$5.00'),
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12),
                   child: Divider(),
                 ),
                 _buildSummaryRow(
-                  'الإجمالي الكلي',
+                  'grandTotal'.tr,
                   '\$${(controller.totalCartPrice + 5).toStringAsFixed(2)}',
                   isTotal: true,
                 ),
@@ -174,8 +175,8 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                     : () async {
                         if (_addressController.text.trim().isEmpty) {
                           Get.snackbar(
-                            'تنبيه',
-                            'يرجى إدخال العنوان أولاً',
+                            'alert'.tr,
+                            'addressRequired'.tr,
                             snackPosition: SnackPosition.BOTTOM,
                             backgroundColor: Colors.orange,
                             colorText: Colors.white,
@@ -187,8 +188,8 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                         final token = await SessionManager.getToken();
                         if (token == null || token.isEmpty) {
                           Get.snackbar(
-                            'تنبيه',
-                            'يرجى تسجيل الدخول أولاً لإتمام العملية',
+                            'alert'.tr,
+                            'loginRequiredForCheckout'.tr,
                             snackPosition: SnackPosition.BOTTOM,
                             backgroundColor: Colors.red,
                             colorText: Colors.white,
@@ -211,8 +212,8 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                           controller
                               .getCart(); // تحديث السلة لمسح العناصر بعد نجاح الطلب
                           Get.snackbar(
-                            'تم الطلب',
-                            'تم تأكيد طلبك بنجاح وسوف يتم التواصل معك قريباً',
+                            'orderPlacedTitle'.tr,
+                            'orderPlacedMessage'.tr,
                             snackPosition: SnackPosition.BOTTOM,
                             backgroundColor: Colors.green,
                             colorText: Colors.white,
@@ -228,9 +229,11 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                           strokeWidth: 2,
                         ),
                       )
-                    : const Text(
-                        'تأكيد وشراء الآن',
-                        style: TextStyle(
+                    : Text(
+                        // This line was already correct
+                        'confirmAndBuy'.tr,
+                        style: const TextStyle(
+                          // This line was already correct
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -286,7 +289,7 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
             ],
           ),
         ),
-        TextButton(onPressed: onEdit, child: const Text('تغيير')),
+        TextButton(onPressed: onEdit, child: Text('change'.tr)),
       ],
     );
   }

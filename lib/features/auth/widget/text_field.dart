@@ -24,34 +24,35 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      cursorColor: const Color(0xFF1A1A1A), // لون المؤشر
+      cursorColor: theme.colorScheme.primary,
       controller: controller,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
       obscureText: obscureText,
       validator: validator,
-      style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+      style: TextStyle(fontSize: 14.sp, color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: TextStyle(
-          color: Colors.grey[500],
+          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
           fontSize: 12.sp,
           fontWeight: FontWeight.w500,
         ),
         prefixIcon: prefixIcon, // استخدام prefixIcon
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: const Color(0xFFF8F9FA), // خلفية خفيفة جداً
+        fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.3),
         contentPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 18.h),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(50.r), // حواف دائرية
-          borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+          borderRadius: BorderRadius.circular(50.r),
+          borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(50.r),
-          borderSide: const BorderSide(color: Color(0xFF1A1A1A), width: 1.5),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(50.r),

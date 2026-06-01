@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mega_cart/features/home/view/home_view.dart';
 import 'package:mega_cart/features/favorites/view/favorit_view.dart';
+import 'package:get/get.dart'; // Import Get for .tr extension
 import 'package:mega_cart/features/cart/view/cart_view.dart';
 import 'package:mega_cart/features/profile/view/profiel_view.dart';
 
@@ -14,13 +15,14 @@ class Root extends StatefulWidget {
 class _RootState extends State<Root> {
   int _currentIndex = 0;
 
-  // قائمة الصفحات (استخدمنا HomeView والباقي كمكان محجوز حتى تنشئ ملفاتهم)
   final List<Widget> _pages = [
-    const HomeView(),
-    const Center(child: Text('الطلبات', style: TextStyle(fontSize: 24))),
-    const CartView(),
-    const FavoritView(),
-    const ProfileView(),
+    const HomeView(), // Home
+    Center(
+      child: Text('orders'.tr, style: const TextStyle(fontSize: 24)),
+    ), // Orders
+    const CartView(), // Cart
+    const FavoritView(), // Favorites
+    const ProfileView(), // Profile
   ];
 
   @override
@@ -36,31 +38,31 @@ class _RootState extends State<Root> {
             _currentIndex = index;
           });
         },
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'الرئيسية',
+            icon: const Icon(Icons.home_outlined), // Home
+            selectedIcon: const Icon(Icons.home), // Home
+            label: 'home'.tr,
           ),
           NavigationDestination(
-            icon: Icon(Icons.receipt_long_outlined),
-            selectedIcon: Icon(Icons.receipt_long),
-            label: 'الطلبات',
+            icon: const Icon(Icons.receipt_long_outlined), // Orders
+            selectedIcon: const Icon(Icons.receipt_long), // Orders
+            label: 'orders'.tr,
           ),
           NavigationDestination(
-            icon: Icon(Icons.shopping_cart_outlined),
-            selectedIcon: Icon(Icons.shopping_cart),
-            label: 'السلة',
+            icon: const Icon(Icons.shopping_cart_outlined), // Cart
+            selectedIcon: const Icon(Icons.shopping_cart), // Cart
+            label: 'cartTab'.tr,
           ),
           NavigationDestination(
-            icon: Icon(Icons.favorite_outline),
-            selectedIcon: Icon(Icons.favorite),
-            label: 'المفضلة',
+            icon: const Icon(Icons.favorite_outline), // Favorites
+            selectedIcon: const Icon(Icons.favorite), // Favorites
+            label: 'favorites'.tr,
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'حسابي',
+            icon: const Icon(Icons.person_outline), // My Account
+            selectedIcon: const Icon(Icons.person), // My Account
+            label: 'myAccount'.tr,
           ),
         ],
       ),

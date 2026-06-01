@@ -16,6 +16,8 @@ class _SplashScreenViewState extends State<SplashScreenView>
   late AnimationController _controller;
   late Animation<Offset> _megaAnimation;
   late Animation<Offset> _cartAnimation;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _shimmerAnimation;
 
   @override
   void initState() {
@@ -61,6 +63,14 @@ class _SplashScreenViewState extends State<SplashScreenView>
           ),
         );
 
+    // 4. أنيميشن الاختفاء (Fade Out): يبدأ في آخر 20% من وقت الأنميشن
+    _fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.8, 1.0, curve: Curves.easeIn),
+      ),
+    );
+
     _controller.forward(); // ابدأ الأنيميشن فوراً
 
     // زيادة التأخير ليتناسب مع المدة الجديدة (6 ثوانٍ للأنيميشن + نصف ثانية سكون)
@@ -80,8 +90,6 @@ class _SplashScreenViewState extends State<SplashScreenView>
     });
   }
 
-  late Animation<double> _shimmerAnimation;
-
   @override
   void dispose() {
     _controller.dispose();
@@ -90,18 +98,22 @@ class _SplashScreenViewState extends State<SplashScreenView>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = isDark ? Colors.white : theme.colorScheme.primary;
+
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF0F2027), // أزرق ليلي غامق جدًا (Midnight)
-              Color(0xFF203A43), // أزرق بترولي عميق
-              Color(0xFF2C5364), // درجة أفتح قليلاً لإعطاء عمق للمكان
+              theme.colorScheme.primary.withOpacity(isDark ? 0.3 : 0.12),
+              theme.colorScheme.surface,
+              theme.colorScheme.surface,
             ],
           ),
         ),
@@ -113,8 +125,8 @@ class _SplashScreenViewState extends State<SplashScreenView>
                 shaderCallback: (bounds) {
                   // إذا وصلنا لمرحلة الحركة (تبدأ عند 0.6)، نجعل النص أبيض ساطع وثابت
                   if (_controller.value >= 0.6) {
-                    return const LinearGradient(
-                      colors: [Colors.white, Colors.white],
+                    return LinearGradient(
+                      colors: [baseColor, baseColor],
                     ).createShader(bounds);
                   }
 
@@ -123,13 +135,11 @@ class _SplashScreenViewState extends State<SplashScreenView>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Colors.white.withOpacity(
-                        0.05,
-                      ), // تعتيم أكثر لإبراز قوة النور
-                      Colors.white.withOpacity(0.2),
-                      Colors.white, // مركز النور الساطع
-                      Colors.white.withOpacity(0.2),
-                      Colors.white.withOpacity(0.05),
+                      baseColor.withOpacity(0.05),
+                      baseColor.withOpacity(0.2),
+                      baseColor, // مركز النور الساطع
+                      baseColor.withOpacity(0.2),
+                      baseColor.withOpacity(0.05),
                     ],
                     // توسيع النطاق لجعل "عرض" الضوء أكبر على الكلمات
                     stops: const [0.0, 0.35, 0.5, 0.65, 1.0],
@@ -142,37 +152,40 @@ class _SplashScreenViewState extends State<SplashScreenView>
                 child: child,
               );
             },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SlideTransition(
-                  position: _megaAnimation,
-                  child: Text(
-                    'Mega',
-                    style: GoogleFonts.playball(
-                      fontSize: 50,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.white,
-                      letterSpacing: 1.2,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SlideTransition(
+                    position: _megaAnimation,
+                    child: Text(
+                      'Mega',
+                      style: GoogleFonts.playball(
+                        fontSize: 50,
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic,
+                        color: baseColor,
+                        letterSpacing: 1.2,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                SlideTransition(
-                  position: _cartAnimation,
-                  child: Text(
-                    'Cart',
-                    style: GoogleFonts.playball(
-                      fontSize: 50,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.white,
-                      letterSpacing: 1.2,
+                  const SizedBox(width: 10),
+                  SlideTransition(
+                    position: _cartAnimation,
+                    child: Text(
+                      'Cart',
+                      style: GoogleFonts.playball(
+                        fontSize: 50,
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic,
+                        color: baseColor,
+                        letterSpacing: 1.2,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

@@ -1,6 +1,7 @@
+import 'package:get/get.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:mega_cart/features/auth/login/view/login_view.dart';
-import 'package:mega_cart/features/auth/signup/view/singup_view.dart';
+import 'package:mega_cart/features/auth/signup/view/signup_view.dart';
 import 'package:mega_cart/features/auth/verify_email/view/verify_email_view.dart';
 import 'package:mega_cart/features/createProduct/view/create_product_view.dart';
 import 'package:mega_cart/features/home/view/home_view.dart';
@@ -31,13 +32,23 @@ class AppRoutes {
 
 class AppPages {
   static final pages = [
-    GetPage(name: AppRoutes.login, page: () => const LoginView()),
-    GetPage(name: AppRoutes.register, page: () => const SingupView()),
+    GetPage(
+      name: AppRoutes.login,
+      page: () => const LoginView(),
+      transition: Transition.fade,
+      transitionDuration: const Duration(milliseconds: 1200),
+    ),
+    GetPage(name: AppRoutes.signup, page: () => const SingupView()),
     GetPage(name: AppRoutes.verifyEmail, page: () => const VerifyEmailView()),
     GetPage(name: AppRoutes.forgotPassword, page: () => const LoginView()),
     GetPage(name: AppRoutes.splash, page: () => const SplashScreenView()),
     GetPage(name: AppRoutes.home, page: () => const HomeView()),
-    GetPage(name: AppRoutes.root, page: () => const Root()),
+    GetPage(
+      name: AppRoutes.root,
+      page: () => const Root(),
+      transition: Transition.fade,
+      transitionDuration: const Duration(milliseconds: 1200),
+    ),
     GetPage(name: AppRoutes.detail, page: () => const ProductDetailsView()),
     GetPage(name: AppRoutes.createProduct, page: () => CreateProductView()),
     GetPage(

@@ -1,0 +1,24 @@
+{
+  "helloWorld": "Hello World!",
+  "welcomeUser": "Welcome, {username}!",
+  "@welcomeUser": {
+    "description": "A welcome message for the user",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "settings": "Settings",
+  "appearance": "Appearance",
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+  "language": "Language",
+  "changeLanguage": "Change Language",
+  "selectLanguageDescription": "Select your preferred language",
+  "english": "English",
+  "arabic": "Arabic",
+  "account": "Account",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service"
+}

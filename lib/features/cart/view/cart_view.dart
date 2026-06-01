@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mega_cart/features/cart/data/controller/cart_controller.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mega_cart/features/cart/view/checkout_bottom_sheet.dart';
+import 'package:mega_cart/features/settings/view/cart_item_card.dart';
 
 class CartView extends StatelessWidget {
   const CartView({super.key});
@@ -10,10 +10,11 @@ class CartView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(CartController());
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('السلة'),
+        title: Text('cart'.tr),
         centerTitle: true,
         actions: [
           // Obx هنا تجعل الزر يختفي ويظهر تلقائياً حسب حالة السلة
@@ -38,7 +39,7 @@ class CartView extends StatelessWidget {
         // 2. التحقق من الأخطاء
         if (controller.errorMessage.isNotEmpty &&
             controller.cartProducts.isEmpty) {
-          return const Center(child: Text('حدث خطأ أثناء جلب البيانات'));
+          return Center(child: Text('fetchError'.tr));
         }
 
         // 3. التحقق مما إذا كانت السلة فارغة بعد انتهاء التحميل
@@ -61,101 +62,16 @@ class CartView extends StatelessWidget {
 
               if (cartItem == null) return const SizedBox.shrink();
 
-              return Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    // صورة المنتج
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: CachedNetworkImage(
-                        imageUrl: product.coverPictureUrl,
-                        width: 85,
-                        height: 85,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            Container(color: Colors.grey[100]),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.image_not_supported),
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    // تفاصيل المنتج
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            product.name,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '\$${product.price.toStringAsFixed(2)}',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 14,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 5,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  'العدد: ${cartItem.quantity}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                '\$${(cartItem.price * cartItem.quantity).toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    // زر حذف المنتج الفردي
-                    IconButton(
-                      onPressed: () => controller.deleteCartItem(cartItem.id),
-                      icon: const Icon(Icons.delete_outline, color: Colors.red),
-                    ),
-                  ],
-                ),
+              return CartItemCard(
+                name: product.name,
+                price: product.price,
+                imageUrl: product.coverPictureUrl,
+                quantity: cartItem.quantity,
+                onAdd: () => controller.addToCart(product, quantity: 1),
+                onRemove: () => cartItem.quantity > 1
+                    ? controller.addToCart(product, quantity: -1)
+                    : null,
+                onDelete: () => controller.deleteCartItem(cartItem.id),
               );
             },
           ),
@@ -169,11 +85,11 @@ class CartView extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.scaffoldBackgroundColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: theme.shadowColor.withOpacity(0.05),
                 spreadRadius: 5,
                 blurRadius: 10,
                 offset: const Offset(0, -3),
@@ -187,20 +103,17 @@ class CartView extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'إجمالي السلة',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                    Text(
+                      'totalCart'.tr,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
                       '\$${controller.totalCartPrice.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontSize: 22,
+                      style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                        color: theme.colorScheme.primary,
                       ),
                     ),
                   ],
@@ -229,9 +142,12 @@ class CartView extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
-                          'Check Now',
-                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        child: Text(
+                          'checkoutNow'.tr,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -246,15 +162,24 @@ class CartView extends StatelessWidget {
   }
 
   Widget _buildEmptyCart() {
-    return const Center(
+    return Center(
+      // This line was already correct
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.shopping_cart_outlined, size: 64, color: Colors.grey),
-          SizedBox(height: 16),
+          const Icon(
+            // This line was already correct
+            Icons.shopping_cart_outlined,
+            size: 64,
+            color: Colors.grey,
+          ),
+          const SizedBox(height: 16), // This line was already correct
           Text(
-            'السلة فارغة',
-            style: TextStyle(fontSize: 18, color: Colors.grey),
+            'emptyCart'.tr,
+            style: const TextStyle(
+              fontSize: 18,
+              color: Colors.grey,
+            ), // This line was already correct
           ),
         ],
       ),
@@ -264,17 +189,24 @@ class CartView extends StatelessWidget {
   void _showClearCartDialog(BuildContext context, CartController controller) {
     Get.dialog(
       AlertDialog(
-        title: const Text('مسح السلة'),
-        content: const Text('هل تريد مسح جميع المنتجات من السلة؟'),
+        // This line was already correct
+        title: Text('clearCartTitle'.tr),
+        content: Text('clearCartMessage'.tr),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('إلغاء')),
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('cancel'.tr),
+          ), // This line was already correct
           TextButton(
             onPressed: () {
               controller.clearCart();
               Get.back();
             },
-            child: const Text('مسح', style: TextStyle(color: Colors.red)),
+            child: Text(
+              'clear'.tr,
+              style: const TextStyle(color: Colors.red),
+            ), // This line was already correct
           ),
         ],
       ),

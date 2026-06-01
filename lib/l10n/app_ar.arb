@@ -1,0 +1,24 @@
+{
+  "helloWorld": "أهلاً بك!",
+  "welcomeUser": "مرحباً بك، {username}!",
+  "@welcomeUser": {
+    "description": "رسالة ترحيب بالمستخدم",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "settings": "الإعدادات",
+  "appearance": "المظهر",
+  "enabled": "مفعّل",
+  "disabled": "معطّل",
+  "language": "اللغة",
+  "changeLanguage": "تغيير اللغة",
+  "selectLanguageDescription": "اختر لغتك المفضلة",
+  "english": "الإنجليزية",
+  "arabic": "العربية",
+  "account": "الحساب",
+  "privacyPolicy": "سياسة الخصوصية",
+  "termsOfService": "شروط الخدمة"
+}

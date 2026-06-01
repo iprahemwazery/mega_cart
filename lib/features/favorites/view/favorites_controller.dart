@@ -72,27 +72,27 @@ class FavoritesController extends GetxController {
     String message, {
     required bool isAdded,
   }) {
-    Get.snackbar(
-      title,
-      message,
-      snackPosition: SnackPosition.BOTTOM, // يظهر من الأسفل
-      backgroundColor: Colors.black.withOpacity(0.8),
-      colorText: Colors.white,
-      borderRadius: 8,
-      margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      icon: Icon(
-        isAdded ? Icons.favorite : Icons.favorite_border,
-        color: isAdded ? Colors.red : Colors.orange,
-        size: 20,
-      ),
-      duration: const Duration(seconds: 2),
-      animationDuration: const Duration(milliseconds: 300),
-      isDismissible: true,
-      forwardAnimationCurve: Curves.easeOutCubic,
-      reverseAnimationCurve: Curves.easeInCubic,
-      barBlur: 0,
-      overlayBlur: 0,
-    );
+    // Get.snackbar(
+    //   title,
+    //   message,
+    //   snackPosition: SnackPosition.BOTTOM, // يظهر من الأسفل
+    //   backgroundColor: Colors.black.withOpacity(0.8),
+    //   colorText: Colors.white,
+    //   borderRadius: 8,
+    //   margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+    //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    //   icon: Icon(
+    //     isAdded ? Icons.favorite : Icons.favorite_border,
+    //     color: isAdded ? Colors.red : Colors.orange,
+    //     size: 20,
+    //   ),
+    //   duration: const Duration(seconds: 2),
+    //   animationDuration: const Duration(milliseconds: 300),
+    //   isDismissible: true,
+    //   forwardAnimationCurve: Curves.easeOutCubic,
+    //   reverseAnimationCurve: Curves.easeInCubic,
+    //   barBlur: 0,
+    //   overlayBlur: 0,
+    // );
   }
 }

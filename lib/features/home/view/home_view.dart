@@ -14,6 +14,7 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homeController = Get.put(HomeController());
+    final theme = Theme.of(context);
     final categoryController = Get.put(CategoryController());
 
     return Scaffold(
@@ -67,7 +68,7 @@ class HomeView extends StatelessWidget {
                   // 1. المحتوى الأساسي (المنتجات أو الأقسام)
                   Obx(() {
                     if (!homeController.showCategories.value) {
-                      return _buildProductsContent(homeController);
+                      return _buildProductsContent(context, homeController);
                     }
                     return StaticCategoriesContent();
                   }),
@@ -78,7 +79,10 @@ class HomeView extends StatelessWidget {
                       // استخدام المتغير من الكنترولر
                       return Container(
                         color: Theme.of(context).scaffoldBackgroundColor,
-                        child: _buildSearchResultsOverlay(homeController),
+                        child: _buildSearchResultsOverlay(
+                          context,
+                          homeController,
+                        ),
                       );
                     }
                     return const SizedBox.shrink();
@@ -93,15 +97,21 @@ class HomeView extends StatelessWidget {
   }
 
   // ويدجت منفصل لنتائج البحث تظهر فوق المحتوى
-  Widget _buildSearchResultsOverlay(HomeController homeController) {
+  Widget _buildSearchResultsOverlay(
+    BuildContext context,
+    HomeController homeController,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Text(
-            'Search Results',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            'searchResults'.tr, // استخدام .tr
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ), // This line was already correct
           ),
         ),
         Expanded(
@@ -111,7 +121,7 @@ class HomeView extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
             if (homeController.products.isEmpty) {
-              return const Center(child: Text('No products found.'));
+              return Center(child: Text('noProductsFound'.tr)); // استخدام .tr
             }
             return ListView.builder(
               itemCount: homeController.products.length,
@@ -142,7 +152,11 @@ class HomeView extends StatelessWidget {
   }
 
   // ويدجت منفصل لعرض شبكة المنتجات
-  Widget _buildProductsContent(HomeController homeController) {
+  Widget _buildProductsContent(
+    BuildContext context,
+    HomeController homeController,
+  ) {
+    final theme = Theme.of(context);
     // إذا كانت القائمة فارغة والتحميل جارٍ، أظهر مؤشر تحميل مركزي
     if (homeController.isLoading.value && homeController.products.isEmpty) {
       return const Center(child: CircularProgressIndicator());
@@ -153,18 +167,11 @@ class HomeView extends StatelessWidget {
         if (!homeController.showCategories.value) ...[
           Align(
             alignment: Alignment.centerLeft,
-            child: const Text(
-              'New Arrivals',
-              style: TextStyle(
-                fontSize: 16,
+            child: Text(
+              'newArrivals'.tr, // استخدام .tr
+              style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                shadows: [
-                  Shadow(
-                    offset: Offset(0.5, 0.5), // إزاحة الظل
-                    blurRadius: 1.0, // نعومة الظل
-                    color: Colors.black38,
-                  ), // لون الظل وشفافيته
-                ],
+                color: theme.colorScheme.onSurface,
               ),
             ),
           ),

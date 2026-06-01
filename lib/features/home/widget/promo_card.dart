@@ -8,12 +8,15 @@ class PromoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       height: 150,
       margin: EdgeInsets.zero, // إزالة الهامش ليتماشى مع حواف التطبيق
       decoration: BoxDecoration(
-        color: const Color(0xFFFDFDFD), // لون شبه أبيض فخم
-        borderRadius: BorderRadius.circular(20),
+        color: theme.colorScheme.surfaceVariant.withOpacity(
+          0.5,
+        ), // يتفاعل مع الثيم
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -23,10 +26,9 @@ class PromoCard extends StatelessWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
         child: Stack(
           children: [
-            // نصف دائرة في اليمين من الأعلى
             Positioned(
               top: -20,
               right: -50,
@@ -34,7 +36,7 @@ class PromoCard extends StatelessWidget {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.4),
+                  color: theme.colorScheme.primary.withOpacity(0.3),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -47,7 +49,7 @@ class PromoCard extends StatelessWidget {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.4),
+                  color: theme.colorScheme.primary.withOpacity(0.3),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -60,8 +62,8 @@ class PromoCard extends StatelessWidget {
                   Text(
                     promoText,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.black87,
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -69,8 +71,8 @@ class PromoCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     byText,
-                    style: const TextStyle(
-                      color: Colors.blueAccent,
+                    style: TextStyle(
+                      color: theme.colorScheme.primary,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                     ),

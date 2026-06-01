@@ -2,107 +2,88 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/core/app_router.dart';
-import 'package:mega_cart/features/splashScreen/view/session_manager.dart';
 import 'package:mega_cart/features/auth/widget/text_field.dart';
 import 'package:mega_cart/features/auth/login/view/social_login_buttons.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 
-class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+class SingupView extends StatefulWidget {
+  const SingupView({super.key});
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  State<SingupView> createState() => _SingupViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
+class _SingupViewState extends State<SingupView> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   bool _isPasswordObscured = true;
+  bool _isConfirmPasswordObscured = true;
   bool _isLoading = false;
 
   @override
   void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _loginUser() async {
-    if (_formKey.currentState?.validate() != true) {
-      return;
-    }
+  Future<void> _registerUser() async {
+    if (_formKey.currentState?.validate() != true) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     final data = {
+      'firstName': _firstNameController.text.trim(),
+      'lastName': _lastNameController.text.trim(),
       'email': _emailController.text.trim(),
       'password': _passwordController.text,
     };
 
     try {
       final dio = Dio();
-      debugPrint('login request: ${data.toString()}');
       final response = await dio.post(
-        ApiConstans.baseUrl + ApiConstans.login,
+        ApiConstans.baseUrl + ApiConstans.register,
         data: data,
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
-      debugPrint('login response: ${response.statusCode} ${response.data}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data;
-        String token = 'dummy_token';
-        if (data is Map) {
-          token =
-              data['token'] ??
-              data['accessToken'] ??
-              data['authToken'] ??
-              'dummy_token';
-        }
-
-        await SessionManager.setLoggedIn(token, _emailController.text.trim());
-
         Get.snackbar(
           'success'.tr,
-          'loginSuccess'.tr,
+          'signupSuccess'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.withOpacity(0.1),
+        );
+        Get.toNamed(
+          AppRoutes.verifyEmail,
+          arguments: {'email': _emailController.text.trim()},
+        );
+      }
+    } on DioException catch (e) {
+      assert(() {
+        debugPrint('--- Registration API Error ---');
+        debugPrint('Path: ${e.requestOptions.path}\nData: ${e.response?.data}');
+        return true;
+      }());
 
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        Get.offAllNamed(AppRoutes.root);
-      } else {
-        Get.snackbar(
-          'Error',
-          response.data.toString().tr,
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
-    } on DioException catch (error) {
-      String message = 'loginError'.tr;
-      debugPrint(
-        'login error: ${error.response?.statusCode} ${error.response?.data}',
-      );
-      if (error.response != null && error.response?.data != null) {
-        message = error.response?.data.toString() ?? message;
-      }
-      Get.snackbar('error'.tr, message, snackPosition: SnackPosition.BOTTOM);
-    } catch (error) {
       Get.snackbar(
         'Error',
-        'serverConnectionFailed'.tr,
+        e.response?.data.toString() ?? 'signupFailed'.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -110,7 +91,6 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -132,7 +112,7 @@ class _LoginViewState extends State<LoginView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 60.h),
+                    SizedBox(height: 30.h),
                     FadeInDelayed(
                       delay: 0,
                       child: Center(
@@ -168,133 +148,201 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 40.h),
+                    SizedBox(height: 30.h),
                     FadeInDelayed(
                       delay: 200,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'welcomeBack'.tr,
-                            style: theme.textTheme.headlineMedium?.copyWith(
+                            'createAccountTitle'.tr,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 24.sp,
+                              fontWeight: FontWeight.w800,
                               color: theme.colorScheme.primary,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            'fillDetails'.tr,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14.sp,
+                              color: theme.colorScheme.primary.withOpacity(0.7),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      'enterCredentials'.tr,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.primary.withOpacity(0.7),
-                      ),
-                    ),
-                    SizedBox(height: 35.h),
-                    // Input Fields
+                    SizedBox(height: 30.h),
                     FadeInDelayed(
                       delay: 400,
                       child: Column(
                         children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: CustomTextField(
+                                  labelText: 'firstName'.tr,
+                                  prefixIcon: Icon(
+                                    Icons.person_outline,
+                                    size: 20.sp,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                  controller: _firstNameController,
+                                  validator: (value) =>
+                                      value == null || value.isEmpty
+                                      ? 'firstNameRequired'.tr
+                                      : null,
+                                  obscureText: false,
+                                ),
+                              ),
+                              SizedBox(width: 10.w),
+                              Expanded(
+                                child: CustomTextField(
+                                  labelText: 'lastName'.tr,
+                                  prefixIcon: Icon(
+                                    Icons.person_outline,
+                                    size: 20.sp,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                  controller: _lastNameController,
+                                  validator: (value) =>
+                                      value == null || value.isEmpty
+                                      ? 'lastNameRequired'.tr
+                                      : null,
+                                  obscureText: false,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20.h),
                           CustomTextField(
                             labelText: 'emailAddress'.tr,
                             prefixIcon: Icon(
                               Icons.email_outlined,
-                              color: theme.colorScheme.primary,
                               size: 20.sp,
+                              color: theme.colorScheme.primary,
                             ),
-                            obscureText: false,
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
                             validator: (value) {
                               if (value == null || value.isEmpty)
-                                return 'requiredField'.tr;
+                                return 'emailRequired'.tr;
                               if (!GetUtils.isEmail(value))
-                                return 'invalidEmail'.tr;
+                                return 'enterValidEmail'.tr;
                               return null;
                             },
+                            obscureText: false,
                           ),
-                          SizedBox(height: 25.h),
+                          SizedBox(height: 20.h),
                           CustomTextField(
                             labelText: 'password'.tr,
                             prefixIcon: Icon(
                               Icons.lock_open_outlined,
-                              color: theme.colorScheme.primary,
                               size: 20.sp,
+                              color: theme.colorScheme.primary,
                             ),
                             obscureText: _isPasswordObscured,
                             controller: _passwordController,
-                            keyboardType: TextInputType.visiblePassword,
-                            textInputAction: TextInputAction.done,
                             suffixIcon: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _isPasswordObscured = !_isPasswordObscured;
-                                });
-                              },
+                              onPressed: () => setState(
+                                () =>
+                                    _isPasswordObscured = !_isPasswordObscured,
+                              ),
                               icon: Icon(
                                 _isPasswordObscured
                                     ? Icons.visibility_off_outlined
                                     : Icons.visibility_outlined,
+                                size: 20.sp,
                                 color: theme.colorScheme.onSurfaceVariant,
-                                size: 20,
                               ),
                             ),
-                            validator: (value) => value == null || value.isEmpty
-                                ? 'requiredField'.tr
+                            validator: (value) {
+                              final password =
+                                  value ?? ''; // This line was already correct
+                              if (password.isEmpty)
+                                return 'passwordRequired'
+                                    .tr; // This line was already correct
+                              if (password.length < 8)
+                                return 'passwordMinLength'
+                                    .tr; // This line was already correct
+                              if (!RegExp(r'[A-Z]').hasMatch(password))
+                                return 'passwordUppercase'
+                                    .tr; // This line was already correct
+                              if (!RegExp(r'[a-z]').hasMatch(password))
+                                return 'passwordLowercase'
+                                    .tr; // This line was already correct
+                              if (!RegExp(r'[0-9]').hasMatch(password))
+                                return 'passwordNumber'
+                                    .tr; // This line was already correct
+                              if (!RegExp(
+                                r'[!@#\$%\^&*(),.?":{}|<>]',
+                              ).hasMatch(password))
+                                return 'passwordSpecialChar'
+                                    .tr; // This line was already correct
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 20.h),
+                          CustomTextField(
+                            // This line was already correct
+                            labelText: 'confirmPassword'
+                                .tr, // This line was already correct
+                            prefixIcon: Icon(
+                              Icons.lock_outline,
+                              size: 20.sp,
+                              color: theme.colorScheme.primary,
+                            ),
+                            obscureText: _isConfirmPasswordObscured,
+                            controller: _confirmPasswordController,
+                            suffixIcon: IconButton(
+                              onPressed: () => setState(
+                                () => _isConfirmPasswordObscured =
+                                    !_isConfirmPasswordObscured,
+                              ),
+                              icon: Icon(
+                                _isConfirmPasswordObscured
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined,
+                                size: 20.sp,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            validator: (v) => v != _passwordController.text
+                                ? 'passwordsDoNotMatch'
+                                      .tr // This line was already correct
                                 : null,
                           ),
                         ],
                       ),
                     ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'forgotPassword'.tr,
-                          style: TextStyle(
-                            color: theme.colorScheme.primary,
-                            fontSize: 13.sp,
-                          ),
-                        ),
-                      ),
-                    ),
                     SizedBox(height: 30.h),
-                    // Login Button
+                    // Register Button
                     FadeInDelayed(
                       delay: 600,
                       child: Center(
                         child: SizedBox(
-                          width:
-                              200.w, // تقليل العرض ليكون أكثر تناسقاً واحترافية
+                          width: 220.w,
                           height: 56.h,
                           child: ElevatedButton(
-                            onPressed: _isLoading ? null : _loginUser,
+                            onPressed: _isLoading ? null : _registerUser,
                             child: _isLoading
-                                ? SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: theme.colorScheme.onPrimary,
-                                    ),
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white,
                                   )
                                 : Text(
-                                    'signIn'.tr,
+                                    'createAccountButton'.tr,
                                     style: GoogleFonts.montserrat(
-                                      fontSize: 18.sp,
+                                      fontSize: 17.sp,
                                       fontWeight: FontWeight.w700,
-                                      letterSpacing: 1.1,
                                     ),
                                   ),
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 30.h),
-                    // Social Login Divider
+                    SizedBox(height: 25.h),
+                    // Divider
                     FadeInDelayed(
                       delay: 800,
                       child: Column(
@@ -309,7 +357,7 @@ class _LoginViewState extends State<LoginView> {
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                                 child: Text(
-                                  "orContinueWith".tr,
+                                  "orSignUpWith".tr,
                                   style: GoogleFonts.montserrat(
                                     fontSize: 12.sp,
                                     color: theme.colorScheme.onSurfaceVariant,
@@ -324,12 +372,12 @@ class _LoginViewState extends State<LoginView> {
                             ],
                           ),
                           SizedBox(height: 24.h),
-                          // استخدام الويدجت الموحد
+                          // استخدام الويدجت الموحد هنا
                           const SocialLoginButtons(),
                         ],
                       ),
                     ),
-                    SizedBox(height: 30.h),
+                    SizedBox(height: 25.h),
                     // Footer
                     FadeInDelayed(
                       delay: 1000,
@@ -337,21 +385,20 @@ class _LoginViewState extends State<LoginView> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "newHere".tr,
+                            "alreadyHaveAccount".tr,
                             style: GoogleFonts.montserrat(
                               color: theme.colorScheme.onSurfaceVariant,
                               fontSize: 14.sp,
                             ),
                           ),
                           GestureDetector(
-                            onTap: () => Get.toNamed(AppRoutes.signup),
+                            onTap: () => Get.back(),
                             child: Text(
-                              "createAccount".tr,
+                              "signInFooter".tr,
                               style: GoogleFonts.montserrat(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.bold,
                                 color: theme.colorScheme.primary,
-                                decoration: TextDecoration.none,
                               ),
                             ),
                           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
@@ -21,8 +22,7 @@ class ProductDetailsView extends StatefulWidget {
 class _ProductDetailsViewState extends State<ProductDetailsView> {
   late final FavoritesController favoritesController;
   late final CartController cartController;
-  int _quantity = 1; // متغير للتحكم في الكمية
-
+  int _quantity = 1;
   @override
   void initState() {
     super.initState();
@@ -34,13 +34,13 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
   Widget build(BuildContext context) {
     final dynamic args = Get.arguments;
     final String? productId = args is String ? args : null;
-
     if (productId == null || productId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('عذراً، لم يتم العثور على المنتج')),
+      return Scaffold(
+        // This line was already correct
+        // Removed const because Text widget inside is not const
+        body: Center(child: Text('productNotFound'.tr)),
       );
     }
-
     return BlocProvider(
       create: (context) {
         final dio = Dio(BaseOptions(baseUrl: ApiConstans.baseUrl));
@@ -102,11 +102,12 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
       return const Center(child: CircularProgressIndicator());
     } else if (state is ProductDetailsSuccess) {
       final product = state.product;
+      final theme = Theme.of(context);
+      // final l10n = AppLocalizations.of(context)!; // لم نعد نستخدم AppLocalizations
       return SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // عرض الصورة الرئيسية للمنتج
             (product.coverPictureUrl.isNotEmpty &&
                     product.coverPictureUrl != "null" &&
                     Uri.tryParse(product.coverPictureUrl)?.hasAbsolutePath ==
@@ -169,8 +170,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                       Expanded(
                         child: Text(
                           product.name,
-                          style: const TextStyle(
-                            fontSize: 24,
+                          style: theme.textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -192,12 +192,15 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                       const Icon(Icons.star, color: Colors.amber, size: 20),
                       const SizedBox(width: 5),
                       Text(
-                        '${product.rating} (${product.reviewsCount} تقييم)',
-                        style: TextStyle(color: Colors.grey[600]),
+                        '${product.rating} (${product.reviewsCount} ${'reviews'.tr})', // Assuming 'reviews' is a translation key
+                        style: TextStyle(
+                          // Removed nested TextStyle
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
                       const Spacer(),
                       Text(
-                        product.stock > 0 ? 'متوفر' : 'غير متوفر',
+                        product.stock > 0 ? 'available'.tr : 'notAvailable'.tr,
                         style: TextStyle(
                           color: product.stock > 0 ? Colors.green : Colors.red,
                           fontWeight: FontWeight.bold,
@@ -207,8 +210,8 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                   ),
                   const SizedBox(height: 20),
                   // اختيار الكمية
-                  const Text(
-                    'الكمية',
+                  Text(
+                    'quantity'.tr,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
@@ -242,28 +245,24 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                               _quantity++;
                             });
                           } else {
-                            Get.snackbar(
-                              'تنبيه',
-                              'لقد وصلت للحد الأقصى للمخزون',
-                            );
-                          }
+                            Get.snackbar('تنبيه', 'maxStockReached'.tr);
+                          } // This line was already correct
                         },
                       ),
                     ],
                   ),
                   const SizedBox(height: 25),
                   // الوصف
-                  const Text(
-                    'عن المنتج',
+                  Text(
+                    'aboutProduct'.tr,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     product.description,
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: theme.textTheme.bodyLarge?.copyWith(
                       height: 1.5,
-                      color: Colors.black87,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -274,7 +273,9 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
         ),
       );
     } else if (state is ProductDetailsError) {
-      return Center(child: Text(state.message));
+      return Center(
+        child: Text('error'.trParams({'errorMessage': state.message})),
+      );
     }
     return const SizedBox.shrink();
   }
@@ -289,8 +290,11 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: IconButton(
-        icon: Icon(icon, color: Colors.black),
-        onPressed: onPressed,
+        icon: Icon(icon, color: Theme.of(context).primaryColor),
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          onPressed();
+        },
         constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
       ),
     );
@@ -302,15 +306,17 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
     }
 
     final product = state.product;
+    final theme = Theme.of(context);
+    // final l10n = AppLocalizations.of(context)!; // لم نعد نستخدم AppLocalizations
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: theme.shadowColor.withOpacity(0.05),
             spreadRadius: 2,
             blurRadius: 10,
             offset: const Offset(0, -3),
@@ -324,9 +330,12 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'إجمالي السعر',
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                Text(
+                  'total'.tr,
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontSize: 14,
+                  ),
                 ),
                 Text(
                   '\$${(product.price * _quantity).toStringAsFixed(2)}',
@@ -348,12 +357,14 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-                onPressed: () =>
-                    cartController.toggleCart(product, quantity: _quantity),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  cartController.toggleCart(product, quantity: _quantity);
+                },
                 child: Obx(() {
                   final isInCart = cartController.isInCart(product.id);
                   return Text(
-                    isInCart ? 'إزالة من السلة' : 'أضف إلى السلة',
+                    isInCart ? 'removeFromCart'.tr : 'addToCart'.tr,
                     style: const TextStyle(fontSize: 18, color: Colors.white),
                   );
                 }),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:mega_cart/core/NetWork/order_controller.dart';
+import 'package:mega_cart/features/cart/data/cart_cubit.dart';
+import 'package:mega_cart/features/cart/view/cart_state.dart';
 import 'package:mega_cart/features/splashScreen/view/session_manager.dart';
-import 'package:mega_cart/features/cart/data/controller/cart_controller.dart';
 
 class CheckoutBottomSheet extends StatefulWidget {
   const CheckoutBottomSheet({super.key});
@@ -26,7 +28,6 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<CartController>();
     final orderController = Get.put(OrderController());
     final theme = Theme.of(context);
 
@@ -136,9 +137,11 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
             ),
             child: Column(
               children: [
-                _buildSummaryRow(
-                  'subtotal'.tr,
-                  '\$${controller.totalCartPrice.toStringAsFixed(2)}',
+                BlocBuilder<CartCubit, CartState>(
+                  builder: (context, state) => _buildSummaryRow(
+                    'subtotal'.tr,
+                    '\$${state.totalCartPrice.toStringAsFixed(2)}',
+                  ),
                 ),
                 const SizedBox(height: 8),
                 _buildSummaryRow('deliveryFee'.tr, '\$5.00'),
@@ -146,10 +149,12 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                   padding: EdgeInsets.symmetric(vertical: 12),
                   child: Divider(),
                 ),
-                _buildSummaryRow(
-                  'grandTotal'.tr,
-                  '\$${(controller.totalCartPrice + 5).toStringAsFixed(2)}',
-                  isTotal: true,
+                BlocBuilder<CartCubit, CartState>(
+                  builder: (context, state) => _buildSummaryRow(
+                    'grandTotal'.tr,
+                    '\$${(state.totalCartPrice + 5).toStringAsFixed(2)}',
+                    isTotal: true,
+                  ),
                 ),
               ],
             ),
@@ -209,8 +214,7 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
 
                         if (response != null) {
                           Get.back(); // إغلاق الـ Bottom Sheet
-                          controller
-                              .getCart(); // تحديث السلة لمسح العناصر بعد نجاح الطلب
+                          context.read<CartCubit>().getCart(); // تحديث السلة
                           Get.snackbar(
                             'orderPlacedTitle'.tr,
                             'orderPlacedMessage'.tr,
@@ -230,7 +234,6 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                         ),
                       )
                     : Text(
-                        // This line was already correct
                         'confirmAndBuy'.tr,
                         style: const TextStyle(
                           // This line was already correct
@@ -244,53 +247,6 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
           const SizedBox(height: 20),
         ],
       ),
-    );
-  }
-
-  Widget _buildInfoSection(
-    BuildContext context, {
-    required String title,
-    required IconData icon,
-    required String content,
-    required VoidCallback onEdit,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icon, color: Theme.of(context).primaryColor, size: 20),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                content,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                ),
-              ),
-            ],
-          ),
-        ),
-        TextButton(onPressed: onEdit, child: Text('change'.tr)),
-      ],
     );
   }
 

@@ -1,113 +1,55 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/core/app_router.dart';
-import 'package:mega_cart/features/splashScreen/view/session_manager.dart';
 import 'package:mega_cart/features/auth/widget/text_field.dart';
 import 'package:mega_cart/features/auth/login/view/social_login_buttons.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mega_cart/features/auth/login/cubit/login_cubit.dart';
+import 'package:mega_cart/features/auth/login/cubit/login_state.dart';
 import 'dart:async';
 
-class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+class LoginView extends StatelessWidget {
+  LoginView({super.key});
 
-  @override
-  State<LoginView> createState() => _LoginViewState();
-}
-
-class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _isPasswordObscured = true;
-  bool _isLoading = false;
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _loginUser() async {
-    if (_formKey.currentState?.validate() != true) {
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    final data = {
-      'email': _emailController.text.trim(),
-      'password': _passwordController.text,
-    };
-
-    try {
-      final dio = Dio();
-      debugPrint('login request: ${data.toString()}');
-      final response = await dio.post(
-        ApiConstans.baseUrl + ApiConstans.login,
-        data: data,
-        options: Options(headers: {'Content-Type': 'application/json'}),
-      );
-      debugPrint('login response: ${response.statusCode} ${response.data}');
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data;
-        String token = 'dummy_token';
-        if (data is Map) {
-          token =
-              data['token'] ??
-              data['accessToken'] ??
-              data['authToken'] ??
-              'dummy_token';
-        }
-
-        await SessionManager.setLoggedIn(token, _emailController.text.trim());
-
-        Get.snackbar(
-          'success'.tr,
-          'loginSuccess'.tr,
-
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        Get.offAllNamed(AppRoutes.root);
-      } else {
-        Get.snackbar(
-          'Error',
-          response.data.toString().tr,
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
-    } on DioException catch (error) {
-      String message = 'loginError'.tr;
-      debugPrint(
-        'login error: ${error.response?.statusCode} ${error.response?.data}',
-      );
-      if (error.response != null && error.response?.data != null) {
-        message = error.response?.data.toString() ?? message;
-      }
-      Get.snackbar('error'.tr, message, snackPosition: SnackPosition.BOTTOM);
-    } catch (error) {
-      Get.snackbar(
-        'Error',
-        'serverConnectionFailed'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    return BlocConsumer<LoginCubit, LoginState>(
+      listener: (context, state) {
+        if (state.status == LoginStatus.success) {
+          Get.snackbar(
+            'success'.tr,
+            'loginSuccess'.tr,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+          Get.offAllNamed(AppRoutes.root);
+        } else if (state.status == LoginStatus.failure) {
+          Get.snackbar(
+            'error'.tr,
+            state.errorMessage?.tr ?? 'loginError'.tr,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      },
+      builder: (context, state) {
+        return _buildUI(context, state);
+      },
+    );
+  }
+
+  void _onLoginPressed(BuildContext context) {
+    context.read<LoginCubit>().login(
+      _emailController.text,
+      _passwordController.text,
+    );
+  }
+
+  Widget _buildUI(BuildContext context, LoginState state) {
     final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -207,13 +149,7 @@ class _LoginViewState extends State<LoginView> {
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
                             textInputAction: TextInputAction.next,
-                            validator: (value) {
-                              if (value == null || value.isEmpty)
-                                return 'requiredField'.tr;
-                              if (!GetUtils.isEmail(value))
-                                return 'invalidEmail'.tr;
-                              return null;
-                            },
+                            errorText: state.emailError,
                           ),
                           SizedBox(height: 25.h),
                           CustomTextField(
@@ -223,27 +159,23 @@ class _LoginViewState extends State<LoginView> {
                               color: theme.colorScheme.primary,
                               size: 20.sp,
                             ),
-                            obscureText: _isPasswordObscured,
+                            obscureText: state.isPasswordObscured,
                             controller: _passwordController,
                             keyboardType: TextInputType.visiblePassword,
                             textInputAction: TextInputAction.done,
                             suffixIcon: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _isPasswordObscured = !_isPasswordObscured;
-                                });
-                              },
+                              onPressed: () => context
+                                  .read<LoginCubit>()
+                                  .togglePasswordVisibility(),
                               icon: Icon(
-                                _isPasswordObscured
+                                state.isPasswordObscured
                                     ? Icons.visibility_off_outlined
                                     : Icons.visibility_outlined,
                                 color: theme.colorScheme.onSurfaceVariant,
                                 size: 20,
                               ),
                             ),
-                            validator: (value) => value == null || value.isEmpty
-                                ? 'requiredField'.tr
-                                : null,
+                            errorText: state.passwordError,
                           ),
                         ],
                       ),
@@ -271,8 +203,10 @@ class _LoginViewState extends State<LoginView> {
                               200.w, // تقليل العرض ليكون أكثر تناسقاً واحترافية
                           height: 56.h,
                           child: ElevatedButton(
-                            onPressed: _isLoading ? null : _loginUser,
-                            child: _isLoading
+                            onPressed: state.status == LoginStatus.loading
+                                ? null
+                                : () => _onLoginPressed(context),
+                            child: state.status == LoginStatus.loading
                                 ? SizedBox(
                                     height: 20,
                                     width: 20,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mega_cart/features/home/view/home_view.dart';
 import 'package:mega_cart/features/favorites/view/favorit_view.dart';
-import 'package:get/get.dart'; // Import Get for .tr extension
+import 'package:get/get.dart';
 import 'package:mega_cart/features/cart/view/cart_view.dart';
 import 'package:mega_cart/features/profile/view/profiel_view.dart';
 
@@ -40,29 +40,29 @@ class _RootState extends State<Root> {
         },
         destinations: [
           NavigationDestination(
-            icon: const Icon(Icons.home_outlined), // Home
-            selectedIcon: const Icon(Icons.home), // Home
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home),
             label: 'home'.tr,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.receipt_long_outlined), // Orders
-            selectedIcon: const Icon(Icons.receipt_long), // Orders
+            icon: const Icon(Icons.receipt_long_outlined),
+            selectedIcon: const Icon(Icons.receipt_long),
             label: 'orders'.tr,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.shopping_cart_outlined), // Cart
-            selectedIcon: const Icon(Icons.shopping_cart), // Cart
+            icon: const Icon(Icons.shopping_cart_outlined),
+            selectedIcon: const Icon(Icons.shopping_cart),
             label: 'cartTab'.tr,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.favorite_outline), // Favorites
-            selectedIcon: const Icon(Icons.favorite), // Favorites
+            icon: const Icon(Icons.favorite_outline),
+            selectedIcon: const Icon(Icons.favorite),
             label: 'favorites'.tr,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.person_outline), // My Account
-            selectedIcon: const Icon(Icons.person), // My Account
-            label: 'myAccount'.tr,
+            icon: const Icon(Icons.person_outline),
+            selectedIcon: const Icon(Icons.person),
+            label: 'profile'.tr,
           ),
         ],
       ),

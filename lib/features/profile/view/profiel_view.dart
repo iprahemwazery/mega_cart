@@ -4,14 +4,11 @@ import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
-import 'package:mega_cart/core/app_router.dart';
 import 'package:mega_cart/core/customs/snackbar.dart';
-import 'package:mega_cart/features/home/controller/home_controller.dart';
 import 'package:mega_cart/features/profile/data/profile_conttroller.dart';
 import 'package:mega_cart/features/profile/widget/profile_cubit.dart';
 import 'package:mega_cart/features/profile/widget/profile_state.dart';
 import 'package:mega_cart/features/profile/widget/user_remote_data_source.dart';
-import 'package:get/get.dart'; // موجود بالفعل
 import 'package:mega_cart/features/profile/widget/user_repository_impl.dart';
 import 'package:mega_cart/features/settings/view/sttings_view.dart';
 
@@ -122,13 +119,9 @@ class ProfileView extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            // تم إضافة Container لإضافة تأثير الحدود والظل
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white,
-                width: 3,
-              ), // حدود بيضاء حول الصورة
+              border: Border.all(color: Colors.white, width: 3),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.2),
@@ -140,7 +133,7 @@ class ProfileView extends StatelessWidget {
             ),
             child: CircleAvatar(
               radius: 60,
-              backgroundColor: Colors.white, // لون خلفية احتياطي
+              backgroundColor: Colors.white,
               child: ClipOval(
                 child: CachedNetworkImage(
                   imageUrl: profilePictureUrl ?? '',
@@ -161,19 +154,16 @@ class ProfileView extends StatelessWidget {
           const SizedBox(height: 15),
           Text(
             userName,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              // استخدام TextTheme لتوحيد الخطوط
-              color: Colors.white,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(color: Colors.white),
           ),
           const SizedBox(height: 5),
-          // You can add email or other info here
           Text(
             userEmail ?? '',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              // استخدام TextTheme لتوحيد الخطوط
-              color: Colors.white70,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyLarge?.copyWith(color: Colors.white70),
           ),
         ],
       ),
@@ -191,7 +181,6 @@ class ProfileView extends StatelessWidget {
             title: 'editProfile'.tr,
             onTap: () {
               GlassSnackbar.show(message: 'سيتم فتح صفحة تعديل الملف الشخصي');
-              // TODO: Navigate to Edit Profile page
             },
           ),
           _buildActionCard(
@@ -232,7 +221,6 @@ class ProfileView extends StatelessWidget {
             title: 'notifications'.tr,
             onTap: () {
               GlassSnackbar.show(message: 'سيتم فتح صفحة الإشعارات');
-              // TODO: Navigate to Notifications page
             },
           ),
           _buildActionCard(
@@ -241,7 +229,6 @@ class ProfileView extends StatelessWidget {
             title: 'helpAndSupport'.tr,
             onTap: () {
               GlassSnackbar.show(message: 'سيتم فتح صفحة المساعدة والدعم');
-              // TODO: Navigate to Help & Support page
             },
           ),
           _buildActionCard(
@@ -259,7 +246,6 @@ class ProfileView extends StatelessWidget {
                 onConfirm: () {
                   ProfileConttroller().logout();
                   GlassSnackbar.show(message: 'تم تسجيل الخروج بنجاح');
-                  // TODO: Implement actual logout logic and navigate to login screen
                 },
               );
             },

@@ -14,7 +14,7 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homeController = Get.put(HomeController());
-    final theme = Theme.of(context);
+    Theme.of(context);
     final categoryController = Get.put(CategoryController());
 
     return Scaffold(

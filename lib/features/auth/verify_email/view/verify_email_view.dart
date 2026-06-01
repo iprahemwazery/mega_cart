@@ -1,118 +1,64 @@
-import 'dart:convert';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/core/app_router.dart';
-import 'package:mega_cart/core/customs/snackbar.dart';
-import 'package:mega_cart/features/splashScreen/view/session_manager.dart';
+import 'package:mega_cart/features/auth/login/view/verify_email_cubit.dart';
+import 'package:mega_cart/features/auth/login/view/verify_email_state.dart';
 import 'package:mega_cart/features/auth/widget/text_field.dart';
 
-class VerifyEmailView extends StatefulWidget {
-  const VerifyEmailView({super.key});
+import 'package:mega_cart/features/auth/login/view/auth_repository_impl.dart';
+import 'package:dio/dio.dart';
 
-  @override
-  State<VerifyEmailView> createState() => _VerifyEmailViewState();
-}
+class VerifyEmailView extends StatelessWidget {
+  VerifyEmailView({super.key})
+    : _emailController = TextEditingController(
+        text: Get.arguments is Map
+            ? (Get.arguments as Map)['email'] as String?
+            : null,
+      );
 
-class _VerifyEmailViewState extends State<VerifyEmailView> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _emailController;
+  final TextEditingController _emailController;
   final TextEditingController _otpController = TextEditingController();
-  bool _isLoading = false;
 
-  @override
-  void initState() {
-    super.initState();
-    final email = Get.arguments is Map
-        ? (Get.arguments as Map)['email'] as String?
-        : null;
-    _emailController = TextEditingController(text: email ?? '');
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _otpController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _verifyEmail() async {
-    if (_formKey.currentState?.validate() != true) {
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    final data = {
-      'email': _emailController.text.trim(),
-      'otp': _otpController.text.trim(),
-    };
-
-    try {
-      final dio = Dio();
-      final response = await dio.post(
-        ApiConstans.baseUrl + ApiConstans.verifyEmail,
-        data: jsonEncode(data),
-        options: Options(headers: {'Content-Type': 'application/json'}),
-      );
-      debugPrint('verify-email request: ${jsonEncode(data)}');
-      debugPrint(
-        'verify-email response: ${response.statusCode} ${response.data}',
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data;
-        String token = 'dummy_token_after_verification';
-        if (data is Map) {
-          token = data['token'] ?? 'dummy_token_after_verification';
-        }
-
-        await SessionManager.setLoggedIn(token, _emailController.text.trim());
-
-        Get.snackbar(
-          'Success',
-          'تم التحقق من البريد الإلكتروني بنجاح',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        Get.offAllNamed(AppRoutes.home);
-      } else {
-        Get.snackbar(
-          'Error',
-          response.data.toString(),
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
-    } on DioException catch (error) {
-      String message = 'حدث خطأ أثناء التحقق';
-      debugPrint(
-        'verify-email error: ${error.response?.statusCode} ${error.response?.data}',
-      );
-      if (error.response != null && error.response?.data != null) {
-        message = error.response?.data.toString() ?? message;
-      }
-      Get.snackbar('Error', message, snackPosition: SnackPosition.BOTTOM);
-    } catch (error) {
-      Get.snackbar(
-        'Error',
-        'فشل الاتصال بالخادم',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
+  void _onVerifyPressed(BuildContext context) {
+    context.read<VerifyEmailCubit>().verifyEmail(
+      _emailController.text,
+      _otpController.text,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => VerifyEmailCubit(AuthRepositoryImpl(Dio())),
+      child: BlocConsumer<VerifyEmailCubit, VerifyEmailState>(
+        listener: (context, state) {
+          if (state.status == VerifyEmailStatus.success) {
+            Get.snackbar(
+              'Success',
+              'تم التحقق من البريد الإلكتروني بنجاح',
+              snackPosition: SnackPosition.BOTTOM,
+            );
+            Get.offAllNamed(AppRoutes.home);
+          } else if (state.status == VerifyEmailStatus.failure &&
+              state.errorMessage != null) {
+            Get.snackbar(
+              'Error',
+              state.errorMessage!.tr,
+              snackPosition: SnackPosition.BOTTOM,
+            );
+          }
+        },
+        builder: (context, state) {
+          return _buildUI(context, state);
+        },
+      ),
+    );
+  }
+
+  Widget _buildUI(BuildContext context, VerifyEmailState state) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -134,11 +80,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) return 'Required';
-                    if (!GetUtils.isEmail(value)) return 'Enter a valid email';
-                    return null;
-                  },
+                  errorText: state.emailError,
                 ),
                 SizedBox(height: 16.h),
                 CustomTextField(
@@ -147,15 +89,16 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                   controller: _otpController,
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.done,
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Required' : null,
+                  errorText: state.otpError,
                 ),
                 SizedBox(height: 24.h),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _verifyEmail,
-                    child: _isLoading
+                    onPressed: state.status == VerifyEmailStatus.loading
+                        ? null
+                        : () => _onVerifyPressed(context),
+                    child: state.status == VerifyEmailStatus.loading
                         ? const SizedBox(
                             height: 20,
                             width: 20,

@@ -70,7 +70,7 @@ class HomeController extends GetxController {
         products.assignAll(response.items);
       }
 
-      hasNextPage.value = response.hasNextPage ?? false;
+      hasNextPage.value = response.hasNextPage;
       debugPrint(
         'HomeController - Products count: ${products.length}, Has next page: ${hasNextPage.value}',
       );

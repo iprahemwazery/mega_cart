@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mega_cart/core/models/product.dart';
 import 'package:mega_cart/core/customs/snackbar.dart';
@@ -8,14 +7,12 @@ import 'dart:convert'; // For jsonEncode and jsonDecode
 class FavoritesController extends GetxController {
   static const _favoritesKey = 'favoriteProducts';
 
-  // قائمة المنتجات المفضلة (Reactive list)
   var favoriteProducts = <Product>[].obs;
 
   @override
   void onInit() {
     super.onInit();
     loadFavorites();
-    // Listen for changes and save
     ever(favoriteProducts, (_) => saveFavorites());
   }
 

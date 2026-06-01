@@ -9,7 +9,8 @@ import 'package:mega_cart/core/NetWork/api_service.dart';
 import 'package:mega_cart/features/singelProfuct/data/product_repository.dart';
 import 'package:mega_cart/features/singelProfuct/data/product_details_cubit.dart';
 import 'package:mega_cart/features/singelProfuct/data/product_details_state.dart';
-import 'package:mega_cart/features/cart/data/controller/cart_controller.dart';
+import 'package:mega_cart/features/cart/data/cart_cubit.dart';
+import 'package:mega_cart/features/cart/view/cart_state.dart';
 import 'package:mega_cart/features/favorites/view/favorites_controller.dart';
 
 class ProductDetailsView extends StatefulWidget {
@@ -21,13 +22,11 @@ class ProductDetailsView extends StatefulWidget {
 
 class _ProductDetailsViewState extends State<ProductDetailsView> {
   late final FavoritesController favoritesController;
-  late final CartController cartController;
   int _quantity = 1;
   @override
   void initState() {
     super.initState();
     favoritesController = Get.put(FavoritesController());
-    cartController = Get.put(CartController());
   }
 
   @override
@@ -359,15 +358,22 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                 ),
                 onPressed: () {
                   HapticFeedback.lightImpact();
-                  cartController.toggleCart(product, quantity: _quantity);
-                },
-                child: Obx(() {
-                  final isInCart = cartController.isInCart(product.id);
-                  return Text(
-                    isInCart ? 'removeFromCart'.tr : 'addToCart'.tr,
-                    style: const TextStyle(fontSize: 18, color: Colors.white),
+                  context.read<CartCubit>().toggleCart(
+                    product,
+                    quantity: _quantity,
                   );
-                }),
+                },
+                child: BlocBuilder<CartCubit, CartState>(
+                  builder: (context, cartState) {
+                    final isInCart = context.read<CartCubit>().isInCart(
+                      product.id,
+                    );
+                    return Text(
+                      isInCart ? 'removeFromCart'.tr : 'addToCart'.tr,
+                      style: const TextStyle(fontSize: 18, color: Colors.white),
+                    );
+                  },
+                ),
               ),
             ),
           ],

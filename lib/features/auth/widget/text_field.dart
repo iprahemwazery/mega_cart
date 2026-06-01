@@ -12,6 +12,7 @@ class CustomTextField extends StatelessWidget {
     this.keyboardType,
     this.textInputAction,
     this.suffixIcon,
+    this.errorText,
   });
   final String labelText;
   final bool obscureText;
@@ -21,6 +22,7 @@ class CustomTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
   final Widget? suffixIcon;
+  final String? errorText;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +45,7 @@ class CustomTextField extends StatelessWidget {
         ),
         prefixIcon: prefixIcon, // استخدام prefixIcon
         suffixIcon: suffixIcon,
+        errorText: errorText,
         filled: true,
         fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.3),
         contentPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 18.h),

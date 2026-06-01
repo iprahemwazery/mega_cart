@@ -64,13 +64,11 @@ class CartController extends GetxController {
     refreshCart();
   }
 
-  // دالة لتحديث السلة (تُستدعى عند فتح الشاشة)
   Future<void> refreshCart() async {
     debugPrint('--- Refreshing Cart Data ---');
-    getCart(); // جلب السلة تلقائياً عند تشغيل الكنترولر
+    getCart();
   }
 
-  // دالة مساعدة لجلب إعدادات الطلب (التوكن)
   Future<Options> _getOptions() async {
     final token = await SessionManager.getToken();
     return Options(
@@ -80,7 +78,6 @@ class CartController extends GetxController {
     );
   }
 
-  // 1. دالة الـ GET (جلب محتويات السلة)
   Future<void> getCart() async {
     try {
       isLoading.value = true;

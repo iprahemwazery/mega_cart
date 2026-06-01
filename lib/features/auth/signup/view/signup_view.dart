@@ -1,22 +1,18 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/core/app_router.dart';
 import 'package:mega_cart/features/auth/widget/text_field.dart';
 import 'package:mega_cart/features/auth/login/view/social_login_buttons.dart';
+import 'package:mega_cart/features/auth/signup/cubit/signup_cubit.dart';
+import 'package:mega_cart/features/auth/signup/cubit/signup_state.dart';
 import 'dart:async';
 
-class SingupView extends StatefulWidget {
-  const SingupView({super.key});
+class SingupView extends StatelessWidget {
+  SingupView({super.key});
 
-  @override
-  State<SingupView> createState() => _SingupViewState();
-}
-
-class _SingupViewState extends State<SingupView> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -24,71 +20,47 @@ class _SingupViewState extends State<SingupView> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-  bool _isPasswordObscured = true;
-  bool _isConfirmPasswordObscured = true;
-  bool _isLoading = false;
 
-  @override
-  void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _registerUser() async {
-    if (_formKey.currentState?.validate() != true) return;
-
-    setState(() => _isLoading = true);
-
-    final data = {
-      'firstName': _firstNameController.text.trim(),
-      'lastName': _lastNameController.text.trim(),
-      'email': _emailController.text.trim(),
-      'password': _passwordController.text,
-    };
-
-    try {
-      final dio = Dio();
-      final response = await dio.post(
-        ApiConstans.baseUrl + ApiConstans.register,
-        data: data,
-        options: Options(headers: {'Content-Type': 'application/json'}),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        Get.snackbar(
-          'success'.tr,
-          'signupSuccess'.tr,
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.withOpacity(0.1),
-        );
-        Get.toNamed(
-          AppRoutes.verifyEmail,
-          arguments: {'email': _emailController.text.trim()},
-        );
-      }
-    } on DioException catch (e) {
-      assert(() {
-        debugPrint('--- Registration API Error ---');
-        debugPrint('Path: ${e.requestOptions.path}\nData: ${e.response?.data}');
-        return true;
-      }());
-
-      Get.snackbar(
-        'Error',
-        e.response?.data.toString() ?? 'signupFailed'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+  void _onRegisterPressed(BuildContext context) {
+    context.read<SignupCubit>().register(
+      firstName: _firstNameController.text,
+      lastName: _lastNameController.text,
+      email: _emailController.text,
+      password: _passwordController.text,
+      confirmPassword: _confirmPasswordController.text,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    return BlocConsumer<SignupCubit, SignupState>(
+      listener: (context, state) {
+        if (state.status == SignupStatus.success) {
+          Get.snackbar(
+            'success'.tr,
+            'signupSuccess'.tr,
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green.withOpacity(0.1),
+          );
+          Get.toNamed(
+            AppRoutes.verifyEmail,
+            arguments: {'email': _emailController.text.trim()},
+          );
+        } else if (state.status == SignupStatus.failure) {
+          Get.snackbar(
+            'Error',
+            state.errorMessage?.tr ?? 'signupFailed'.tr,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      },
+      builder: (context, state) {
+        return _buildUI(context, state);
+      },
+    );
+  }
+
+  Widget _buildUI(BuildContext context, SignupState state) {
     final theme = Theme.of(context);
     return Scaffold(
       body: Container(
@@ -189,10 +161,7 @@ class _SingupViewState extends State<SingupView> {
                                     color: theme.colorScheme.primary,
                                   ),
                                   controller: _firstNameController,
-                                  validator: (value) =>
-                                      value == null || value.isEmpty
-                                      ? 'firstNameRequired'.tr
-                                      : null,
+                                  errorText: state.firstNameError,
                                   obscureText: false,
                                 ),
                               ),
@@ -206,10 +175,7 @@ class _SingupViewState extends State<SingupView> {
                                     color: theme.colorScheme.primary,
                                   ),
                                   controller: _lastNameController,
-                                  validator: (value) =>
-                                      value == null || value.isEmpty
-                                      ? 'lastNameRequired'.tr
-                                      : null,
+                                  errorText: state.lastNameError,
                                   obscureText: false,
                                 ),
                               ),
@@ -225,13 +191,7 @@ class _SingupViewState extends State<SingupView> {
                             ),
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              if (value == null || value.isEmpty)
-                                return 'emailRequired'.tr;
-                              if (!GetUtils.isEmail(value))
-                                return 'enterValidEmail'.tr;
-                              return null;
-                            },
+                            errorText: state.emailError,
                             obscureText: false,
                           ),
                           SizedBox(height: 20.h),
@@ -242,46 +202,21 @@ class _SingupViewState extends State<SingupView> {
                               size: 20.sp,
                               color: theme.colorScheme.primary,
                             ),
-                            obscureText: _isPasswordObscured,
+                            obscureText: state.isPasswordObscured,
                             controller: _passwordController,
                             suffixIcon: IconButton(
-                              onPressed: () => setState(
-                                () =>
-                                    _isPasswordObscured = !_isPasswordObscured,
-                              ),
+                              onPressed: () => context
+                                  .read<SignupCubit>()
+                                  .togglePasswordVisibility(),
                               icon: Icon(
-                                _isPasswordObscured
+                                state.isPasswordObscured
                                     ? Icons.visibility_off_outlined
                                     : Icons.visibility_outlined,
                                 size: 20.sp,
                                 color: theme.colorScheme.onSurfaceVariant,
                               ),
                             ),
-                            validator: (value) {
-                              final password =
-                                  value ?? ''; // This line was already correct
-                              if (password.isEmpty)
-                                return 'passwordRequired'
-                                    .tr; // This line was already correct
-                              if (password.length < 8)
-                                return 'passwordMinLength'
-                                    .tr; // This line was already correct
-                              if (!RegExp(r'[A-Z]').hasMatch(password))
-                                return 'passwordUppercase'
-                                    .tr; // This line was already correct
-                              if (!RegExp(r'[a-z]').hasMatch(password))
-                                return 'passwordLowercase'
-                                    .tr; // This line was already correct
-                              if (!RegExp(r'[0-9]').hasMatch(password))
-                                return 'passwordNumber'
-                                    .tr; // This line was already correct
-                              if (!RegExp(
-                                r'[!@#\$%\^&*(),.?":{}|<>]',
-                              ).hasMatch(password))
-                                return 'passwordSpecialChar'
-                                    .tr; // This line was already correct
-                              return null;
-                            },
+                            errorText: state.passwordError,
                           ),
                           SizedBox(height: 20.h),
                           CustomTextField(
@@ -293,25 +228,21 @@ class _SingupViewState extends State<SingupView> {
                               size: 20.sp,
                               color: theme.colorScheme.primary,
                             ),
-                            obscureText: _isConfirmPasswordObscured,
+                            obscureText: state.isConfirmPasswordObscured,
                             controller: _confirmPasswordController,
                             suffixIcon: IconButton(
-                              onPressed: () => setState(
-                                () => _isConfirmPasswordObscured =
-                                    !_isConfirmPasswordObscured,
-                              ),
+                              onPressed: () => context
+                                  .read<SignupCubit>()
+                                  .toggleConfirmPasswordVisibility(),
                               icon: Icon(
-                                _isConfirmPasswordObscured
+                                state.isConfirmPasswordObscured
                                     ? Icons.visibility_off_outlined
                                     : Icons.visibility_outlined,
                                 size: 20.sp,
                                 color: theme.colorScheme.onSurfaceVariant,
                               ),
                             ),
-                            validator: (v) => v != _passwordController.text
-                                ? 'passwordsDoNotMatch'
-                                      .tr // This line was already correct
-                                : null,
+                            errorText: state.confirmPasswordError,
                           ),
                         ],
                       ),
@@ -325,8 +256,10 @@ class _SingupViewState extends State<SingupView> {
                           width: 220.w,
                           height: 56.h,
                           child: ElevatedButton(
-                            onPressed: _isLoading ? null : _registerUser,
-                            child: _isLoading
+                            onPressed: state.status == SignupStatus.loading
+                                ? null
+                                : () => _onRegisterPressed(context),
+                            child: state.status == SignupStatus.loading
                                 ? const CircularProgressIndicator(
                                     color: Colors.white,
                                   )

@@ -26,7 +26,6 @@ class CheckoutBottomSheet extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // مقبض السحب العلوي
           Container(
             width: 40,
             height: 4,

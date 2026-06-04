@@ -58,7 +58,10 @@ class ProductCard extends StatelessWidget {
                     children: [
                       // Product name
                       Text(
-                        product.name,
+                        Get.locale?.languageCode == 'ar' &&
+                                product.arabicName.isNotEmpty
+                            ? product.arabicName
+                            : product.name,
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,

@@ -1,4 +1,9 @@
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart' hide Transition;
+import 'package:mega_cart/core/NetWork/api_service.dart';
+import 'package:mega_cart/features/singelProfuct/cubit/product_details_cubit.dart';
+import 'package:mega_cart/features/singelProfuct/data/product_repository.dart';
 import 'package:mega_cart/features/auth/login/view/login_view.dart';
 import 'package:mega_cart/features/auth/signup/view/signup_view.dart';
 import 'package:mega_cart/features/auth/verify_email/view/verify_email_view.dart';
@@ -48,7 +53,20 @@ class AppPages {
       transition: Transition.fade,
       transitionDuration: const Duration(milliseconds: 1200),
     ),
-    GetPage(name: AppRoutes.detail, page: () => const ProductDetailsView()),
+    GetPage(
+      name: AppRoutes.detail,
+      page: () {
+        final productId = Get.arguments as String?;
+        final apiService = Get.find<ApiService>();
+        final repository = ProductRepositoryImpl(apiService);
+
+        return BlocProvider(
+          create: (context) =>
+              ProductDetailsCubit(repository, initialProductId: productId),
+          child: const ProductDetailsView(),
+        );
+      },
+    ),
     GetPage(name: AppRoutes.createProduct, page: () => CreateProductView()),
     GetPage(
       name: AppRoutes.productDetails,

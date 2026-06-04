@@ -43,7 +43,6 @@ class CategoryController extends GetxController {
       if (response.data != null &&
           response.data is List &&
           response.data.isNotEmpty) {
-        // الـ Response هو عبارة عن مصفوفة تحتوي على كائن واحد بداخله مفتاح 'categories'
         final List<dynamic> responseList = response.data;
         if (responseList.isNotEmpty &&
             responseList[0] is Map &&
@@ -74,13 +73,9 @@ class CategoryController extends GetxController {
     hasError.value = true;
 
     if (e is DioException) {
-      final res = e.response;
-      debugPrint('Status Code: ${res?.statusCode}');
-      debugPrint('Error Data: ${res?.data}');
-      debugPrint('Dio Message: ${e.message}');
-
+      // Use the sanitized error message from ErrorInterceptor
       errorMessage.value =
-          res?.data?['message'] ?? e.message ?? 'حدث خطأ غير متوقع';
+          e.error?.toString() ?? e.message ?? 'حدث خطأ غير متوقع';
     } else {
       debugPrint('Unknown Error: $e');
       errorMessage.value = e.toString();

@@ -13,7 +13,6 @@ class CartModel {
               ?.map((item) => CartItem.fromJson(item))
               .toList() ??
           [],
-      // ملاحظة: إذا كان الـ API لا يرسل totalPrice كحقل أساسي، يمكننا حسابه يدوياً
       totalPrice: (json['totalPrice'] ?? 0).toDouble(),
     );
   }

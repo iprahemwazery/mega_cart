@@ -39,15 +39,15 @@ class ProductRepositoryImpl implements ProductRepository {
         descriptionArabic: descriptionArabic,
         coverPictureUrl: coverPictureUrl,
         price: price,
-        stock: 10, // بيانات ثابتة
-        weight: 0.5, // بيانات ثابتة
-        color: "Default", // بيانات ثابتة
-        discountPercentage: 0, // بيانات ثابتة
-        categoryIds: [], // بيانات ثابتة
-        productPictureUrls: [], // بيانات ثابتة
+        stock: 10,
+        weight: 0.5,
+        color: "Default",
+        discountPercentage: 0,
+        categoryIds: [],
+        productPictureUrls: [],
       );
       await apiService.addProduct(request);
-      return const Right(null); // لا يوجد بيانات محددة للعودة عند النجاح
+      return const Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -58,7 +58,7 @@ class ProductRepositoryImpl implements ProductRepository {
   Future<Either<Failure, dynamic>> deleteProduct(String id) async {
     try {
       await apiService.deleteProduct(id);
-      return const Right(null); // لا يوجد بيانات محددة للعودة عند النجاح
+      return const Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

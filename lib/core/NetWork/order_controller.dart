@@ -6,7 +6,6 @@ import 'package:mega_cart/core/customs/snackbar.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 class OrderController extends GetxController {
-  // تهيئة مكتبة Dio بنفس الإعدادات المستخدمة في المشروع
   final Dio _dio =
       Dio(
           BaseOptions(
@@ -29,14 +28,11 @@ class OrderController extends GetxController {
           ),
         );
 
-  // متغير تفاعلي لمراقبة حالة التحميل
   final RxBool isLoading = false.obs;
 
-  // دالة الـ Checkout لإرسال طلب جديد
   Future<Map<String, dynamic>?> checkout({
     required String shippingAddressId,
-    required dynamic
-    paymentMethod, // تغيير النوع إلى dynamic للتجربة (String أو int)
+    required dynamic paymentMethod,
     required String token,
   }) async {
     try {
@@ -68,12 +64,10 @@ class OrderController extends GetxController {
     }
   }
 
-  // إدارة الأخطاء وطباعتها باستخدام GlassSnackbar
   void _handleError(dynamic e, String methodName) {
     debugPrint('--- Error in $methodName ---');
 
     if (e is DioException) {
-      // طباعة الرد الكامل من السيرفر في الـ Console لمعرفة سبب الرفض بالتفصيل
       debugPrint('Status Code: ${e.response?.statusCode}');
       debugPrint('Response Data: ${e.response?.data}');
 

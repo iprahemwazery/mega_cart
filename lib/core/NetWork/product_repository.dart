@@ -4,8 +4,6 @@ import 'package:mega_cart/core/models/product.dart';
 
 abstract class ProductRepository {
   Future<Either<Failure, Product>> getProductDetails(String id);
-
-  // New abstract method for adding a product
   Future<Either<Failure, dynamic>> addProduct({
     required String sellerId,
     required String name,
@@ -15,7 +13,5 @@ abstract class ProductRepository {
     required double price,
     required String coverPictureUrl,
   });
-
-  // New abstract method for deleting a product
   Future<Either<Failure, dynamic>> deleteProduct(String id);
 }

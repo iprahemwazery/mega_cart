@@ -8,7 +8,6 @@ class SttingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // تهيئة الكنترولر في الصفحة
     final controller = Get.put(SettingsController());
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
@@ -22,7 +21,6 @@ class SttingsView extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         children: [
-          // مثال لاستخدام النص المترجم مع متغير
           Text(
             l10n.welcomeUser('Wazery'),
             style: theme.textTheme.headlineSmall?.copyWith(
@@ -30,7 +28,6 @@ class SttingsView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          // قسم المظهر (Appearance)
           Text(
             l10n.appearance,
             style: theme.textTheme.titleMedium?.copyWith(
@@ -47,7 +44,7 @@ class SttingsView extends StatelessWidget {
               color: currentTheme.colorScheme.surfaceVariant.withOpacity(0.3),
               child: ListTile(
                 title: const Text(
-                  'Dark Mode', // يمكن إضافة مفتاح لها أيضاً في ARB
+                  'Dark Mode',
                   style: TextStyle(fontWeight: FontWeight.w500),
                 ),
                 subtitle: Text(
@@ -80,7 +77,6 @@ class SttingsView extends StatelessWidget {
           const Divider(),
           const SizedBox(height: 20),
 
-          // قسم اللغة (Language)
           Text(
             l10n.language,
             style: theme.textTheme.titleMedium?.copyWith(
@@ -177,7 +173,6 @@ class SttingsView extends StatelessWidget {
           const Divider(),
           const SizedBox(height: 20),
 
-          // قسم الحساب (Account)
           Text(
             l10n.account,
             style: theme.textTheme.titleMedium?.copyWith(
@@ -206,9 +201,7 @@ class SttingsView extends StatelessWidget {
                 ),
               ),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {
-                // Navigate to Privacy Policy
-              },
+              onTap: () {},
             ),
           ),
           const SizedBox(height: 12),

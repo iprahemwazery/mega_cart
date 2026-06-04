@@ -64,7 +64,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) {
-        // تهيئة الـ Dependencies هنا (يمكن استخدام GetIt أو Provider لإدارة أفضل)
         final dio = Dio(
           BaseOptions(baseUrl: 'https://accessories-eshop.runasp.net/api/'),
         );

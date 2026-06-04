@@ -69,7 +69,6 @@ class CartItemCard extends StatelessWidget {
                 ],
               ),
             ),
-            // أزرار التحكم في الكمية
             Column(
               children: [
                 IconButton(

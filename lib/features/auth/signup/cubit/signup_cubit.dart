@@ -58,8 +58,7 @@ class SignupCubit extends Cubit<SignupState> {
         confirmPasswordError != null) {
       emit(
         state.copyWith(
-          status: SignupStatus
-              .failure, // Or a new status like SignupStatus.validationError
+          status: SignupStatus.failure,
           firstNameError: firstNameError,
           lastNameError: lastNameError,
           emailError: emailError,

@@ -10,13 +10,11 @@ class LanguageService {
   final _box = GetStorage();
   final _key = 'languageCode';
 
-  // الحصول على اللغة الحالية (الافتراضي إنجليزية)
   Locale get locale {
     final code = _box.read(_key) ?? 'en';
     return Locale(code);
   }
 
-  // تغيير اللغة وحفظها
   void changeLanguage(String langCode) {
     Get.updateLocale(Locale(langCode));
     _box.write(_key, langCode);

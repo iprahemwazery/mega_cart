@@ -10,6 +10,8 @@ class HomeHeader extends StatefulWidget {
   final VoidCallback onCategoryPressed;
   final bool showCategories; // To highlight the active button
   final Function(String)? onSearchChanged; // Callback للبحث
+  final Function(String)?
+  onSearchSubmitted; // Callback عند الضغط على زر البحث في الكيبورد
   final Function(bool)? onSearchModeChanged; // إخبار الأب بحالة البحث
   final bool isSearching; // بارامتر جديد للتحكم من الخارج
   const HomeHeader({
@@ -20,6 +22,7 @@ class HomeHeader extends StatefulWidget {
     required this.showCategories,
     required this.isSearching,
     this.onSearchChanged,
+    this.onSearchSubmitted,
     this.onSearchModeChanged,
   });
 
@@ -67,12 +70,15 @@ class _HomeHeaderState extends State<HomeHeader> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       // تقليل الـ padding لتقليل الارتفاع الكلي
       padding: const EdgeInsets.symmetric(
         vertical: 8,
       ), // إزالة الـ padding الأفقي هنا
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.transparent, // لون خلفية الرأس
       ),
       child: SafeArea(
@@ -83,7 +89,10 @@ class _HomeHeaderState extends State<HomeHeader> {
                 ? Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back),
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: colorScheme.onSurface,
+                        ),
                         onPressed: () {
                           widget.onSearchModeChanged?.call(false);
                           _searchController.clear();
@@ -95,12 +104,19 @@ class _HomeHeaderState extends State<HomeHeader> {
                           controller: _searchController,
                           focusNode: _searchFocusNode,
                           autofocus: true,
+                          style: TextStyle(color: colorScheme.onSurface),
+                          textInputAction: TextInputAction
+                              .search, // تغيير زر الـ Enter لأيقونة بحث
                           decoration: InputDecoration(
-                            hintText: 'Search products...',
+                            hintText: 'searchResults'.tr,
                             border: InputBorder.none,
                             suffixIcon: _searchController.text.isNotEmpty
                                 ? IconButton(
-                                    icon: const Icon(Icons.clear, size: 20),
+                                    icon: Icon(
+                                      Icons.clear,
+                                      size: 20,
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
                                     onPressed: () {
                                       _searchController.clear();
                                       widget.onSearchChanged?.call('');
@@ -115,6 +131,9 @@ class _HomeHeaderState extends State<HomeHeader> {
                             setState(() {}); // لإظهار زر X عند بدء الكتابة
                             widget.onSearchChanged?.call(value);
                           },
+                          onSubmitted: (value) {
+                            widget.onSearchSubmitted?.call(value);
+                          },
                         ),
                       ),
                     ],
@@ -127,7 +146,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                         children: [
                           CircleAvatar(
                             radius: 16,
-                            backgroundColor: Colors.blue.shade200,
+                            backgroundColor: colorScheme.primaryContainer,
                             child: const Icon(
                               Icons.person,
                               color: Colors.white,
@@ -140,17 +159,17 @@ class _HomeHeaderState extends State<HomeHeader> {
                             children: [
                               Text(
                                 userNameDisplay,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
+                                  color: colorScheme.onSurface,
                                 ),
                               ),
                               Text(
                                 widget.userEmail,
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.grey[600],
+                                  color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -161,9 +180,9 @@ class _HomeHeaderState extends State<HomeHeader> {
                       Row(
                         children: [
                           IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.search,
-                              color: Colors.black87,
+                              color: colorScheme.onSurface,
                               size: 24,
                             ),
                             onPressed: () {
@@ -172,9 +191,9 @@ class _HomeHeaderState extends State<HomeHeader> {
                             },
                           ),
                           IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.notifications_none,
-                              color: Colors.black87,
+                              color: colorScheme.onSurface,
                               size: 24,
                             ),
                             onPressed: () {
@@ -188,7 +207,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                       ),
                     ],
                   ),
-            const SizedBox(height: 30), // تقليل المسافة بين الصفوف
+            const SizedBox(height: 30),
             Row(
               children: [
                 Spacer(),
@@ -196,41 +215,40 @@ class _HomeHeaderState extends State<HomeHeader> {
                   onPressed: widget.onHomePressed,
                   style: TextButton.styleFrom(
                     backgroundColor: !widget.showCategories
-                        ? Colors.blueAccent
-                        : Colors.grey[200],
+                        ? colorScheme.primary
+                        : colorScheme.surfaceVariant,
                     foregroundColor: !widget.showCategories
-                        ? Colors.white
-                        : Colors.black87,
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurfaceVariant,
                   ),
-                  child: const Text('Home'),
+                  child: Text('home'.tr),
                 ),
                 Spacer(),
                 TextButton(
                   onPressed: widget.onCategoryPressed,
                   style: TextButton.styleFrom(
                     backgroundColor: widget.showCategories
-                        ? Colors.blueAccent
-                        : Colors.grey[200],
+                        ? colorScheme.primary
+                        : colorScheme.surfaceVariant,
                     foregroundColor: widget.showCategories
-                        ? Colors.white
-                        : Colors.black87,
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurfaceVariant,
                   ),
-                  child: const Text('Category'),
+                  child: Text('account'.tr),
                 ),
                 Spacer(),
               ],
             ),
-            const SizedBox(height: 20), // المسافة قبل الـ PageView
+            const SizedBox(height: 20),
             SizedBox(
-              height: 150, // نفس ارتفاع الـ PromoCard
+              height: 150,
               child: PageView.builder(
                 controller: _pageController,
-                itemCount: 3, // ثلاث نسخ من الـ PromoCard
+                itemCount: 3,
                 onPageChanged: (index) {
-                  _currentPage.value = index; // تحديث الصفحة الحالية
+                  _currentPage.value = index;
                 },
                 itemBuilder: (context, index) {
-                  // نصوص مختلفة لكل PromoCard
                   if (index == 0) {
                     return const PromoCard(
                       promoText: '24% off Shipping today \n on bag purchase',
@@ -251,23 +269,21 @@ class _HomeHeaderState extends State<HomeHeader> {
                 },
               ),
             ),
-            const SizedBox(height: 10), // المسافة بين الـ PageView والمؤشر
+            const SizedBox(height: 10),
             Obx(
               () => Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
-                  3, // ثلاث نقاط لكل صفحة
+                  3,
                   (index) => AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                     height: 8,
-                    width: _currentPage.value == index
-                        ? 24
-                        : 8, // النقطة النشطة أطول
+                    width: _currentPage.value == index ? 24 : 8,
                     decoration: BoxDecoration(
                       color: _currentPage.value == index
-                          ? Colors.blueAccent
-                          : Colors.grey.withOpacity(0.5),
+                          ? colorScheme.primary
+                          : colorScheme.outlineVariant,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),

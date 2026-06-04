@@ -65,7 +65,5 @@ class CartRepositoryImpl implements CartRepository {
   }
 
   @override
-  Future<void> clearCart() async {
-    // يتم معالجتها في الـ Cubit عبر التكرار للحفاظ على نفس منطق الكنترولر القديم
-  }
+  Future<void> clearCart() async {}
 }

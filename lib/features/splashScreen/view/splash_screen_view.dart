@@ -23,13 +23,10 @@ class _SplashScreenViewState extends State<SplashScreenView>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(
-        milliseconds: 6000,
-      ), // زيادة المدة ليكون النور والحركة أبطأ بوضوح
+      duration: const Duration(milliseconds: 6000),
       vsync: this,
     );
 
-    // 1. أنيميشن النور: يبدأ من 0 إلى 60% من وقت الأنميشن والكلمات ثابتة تماماً
     _shimmerAnimation = Tween<double>(begin: -1.0, end: 2.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -37,33 +34,22 @@ class _SplashScreenViewState extends State<SplashScreenView>
       ),
     );
 
-    // 2. Mega: تبدأ في مكانها (Offset.zero) وتطلع لفوق في آخر 30% من الوقت
     _megaAnimation =
         Tween<Offset>(begin: Offset.zero, end: const Offset(0, -3.0)).animate(
           CurvedAnimation(
             parent: _controller,
-            curve: const Interval(
-              0.6,
-              1.0,
-              curve: Curves.easeIn, // حركة ناعمة من السكون إلى الأعلى مباشرة
-            ),
+            curve: const Interval(0.6, 1.0, curve: Curves.easeIn),
           ),
         );
 
-    // 3. Cart: تبدأ في مكانها (Offset.zero) وتنزل لتحت في آخر 30% من الوقت
     _cartAnimation =
         Tween<Offset>(begin: Offset.zero, end: const Offset(0, 3.0)).animate(
           CurvedAnimation(
             parent: _controller,
-            curve: const Interval(
-              0.6,
-              1.0,
-              curve: Curves.easeIn, // حركة ناعمة من السكون إلى الأسفل مباشرة
-            ),
+            curve: const Interval(0.6, 1.0, curve: Curves.easeIn),
           ),
         );
 
-    // 4. أنيميشن الاختفاء (Fade Out): يبدأ في آخر 20% من وقت الأنميشن
     _fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -71,12 +57,10 @@ class _SplashScreenViewState extends State<SplashScreenView>
       ),
     );
 
-    _controller.forward(); // ابدأ الأنيميشن فوراً
+    _controller.forward();
 
-    // زيادة التأخير ليتناسب مع المدة الجديدة (6 ثوانٍ للأنيميشن + نصف ثانية سكون)
-    // لضمان خروج الكلمات تماماً من الشاشة قبل الانتقال
     Future.delayed(const Duration(milliseconds: 6500), () async {
-      if (!mounted) return; // تأكد أن الـ Widget لا يزال موجوداً في الشجرة
+      if (!mounted) return;
 
       final isLoggedIn = await SessionManager.isLoggedIn();
       debugPrint('SplashScreen: isLoggedIn = $isLoggedIn');
@@ -123,14 +107,12 @@ class _SplashScreenViewState extends State<SplashScreenView>
             builder: (context, child) {
               return ShaderMask(
                 shaderCallback: (bounds) {
-                  // إذا وصلنا لمرحلة الحركة (تبدأ عند 0.6)، نجعل النص أبيض ساطع وثابت
                   if (_controller.value >= 0.6) {
                     return LinearGradient(
                       colors: [baseColor, baseColor],
                     ).createShader(bounds);
                   }
 
-                  // تأثير النور القوي أثناء السكون
                   return LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -141,9 +123,7 @@ class _SplashScreenViewState extends State<SplashScreenView>
                       baseColor.withOpacity(0.2),
                       baseColor.withOpacity(0.05),
                     ],
-                    // توسيع النطاق لجعل "عرض" الضوء أكبر على الكلمات
                     stops: const [0.0, 0.35, 0.5, 0.65, 1.0],
-                    // تحريك التدرج اللوني بناءً على الأنيميشن
                     transform: _SlidingGradientTransform(
                       _shimmerAnimation.value,
                     ),
@@ -194,7 +174,6 @@ class _SplashScreenViewState extends State<SplashScreenView>
   }
 }
 
-// كلاس مساعد لتحريك التدرج اللوني (النور) من اليسار لليمين
 class _SlidingGradientTransform extends GradientTransform {
   const _SlidingGradientTransform(this.percent);
   final double percent;

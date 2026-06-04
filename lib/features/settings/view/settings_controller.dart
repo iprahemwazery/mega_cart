@@ -8,10 +8,8 @@ class SettingsController extends GetxController {
 
   final currentThemeMode = ThemeService().theme.obs;
 
-  // 1. متغير ملاحَظ لإدارة لغة التطبيق
   final currentLocale = LanguageService().locale.obs;
 
-  // 2. متغير ملاحَظ لتشغيل الـ Switch في الواجهة
   final RxBool isDarkMode = false.obs;
 
   @override
@@ -30,12 +28,10 @@ class SettingsController extends GetxController {
     ThemeService().changeThemeMode(mode);
   }
 
-  // 3. دالة تبديل الوضع الداكن وحفظه
   void toggleTheme(bool value) {
     updateThemeMode(value ? ThemeMode.dark : ThemeMode.light);
   }
 
-  // 4. تغيير لغة التطبيق وحفظها
   void changeLanguage(String langCode) {
     LanguageService().changeLanguage(langCode);
     currentLocale.value = Locale(langCode);

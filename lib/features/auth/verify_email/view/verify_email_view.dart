@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:mega_cart/core/app_router.dart';
-import 'package:mega_cart/features/auth/login/view/verify_email_cubit.dart';
-import 'package:mega_cart/features/auth/login/view/verify_email_state.dart';
+import 'package:mega_cart/features/auth/verify_email/cubit/verify_email_cubit.dart';
+import 'package:mega_cart/features/auth/verify_email/cubit/verify_email_state.dart';
 import 'package:mega_cart/features/auth/widget/text_field.dart';
 
 import 'package:mega_cart/features/auth/login/view/auth_repository_impl.dart';

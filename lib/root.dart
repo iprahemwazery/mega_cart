@@ -3,6 +3,7 @@ import 'package:mega_cart/features/home/view/home_view.dart';
 import 'package:mega_cart/features/favorites/view/favorit_view.dart';
 import 'package:get/get.dart';
 import 'package:mega_cart/features/cart/view/cart_view.dart';
+import 'package:mega_cart/features/order/view/orde_view.dart';
 import 'package:mega_cart/features/profile/view/profiel_view.dart';
 
 class Root extends StatefulWidget {
@@ -16,13 +17,11 @@ class _RootState extends State<Root> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    const HomeView(), // Home
-    Center(
-      child: Text('orders'.tr, style: const TextStyle(fontSize: 24)),
-    ), // Orders
-    const CartView(), // Cart
-    const FavoritView(), // Favorites
-    const ProfileView(), // Profile
+    const HomeView(),
+    const OrderView(),
+    const CartView(),
+    const FavoritView(),
+    const ProfileView(),
   ];
 
   @override

@@ -3,12 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:mega_cart/core/app_router.dart';
-import 'package:mega_cart/features/auth/widget/text_field.dart';
-import 'package:mega_cart/features/auth/login/view/social_login_buttons.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:mega_cart/features/auth/login/cubit/login_cubit.dart';
 import 'package:mega_cart/features/auth/login/cubit/login_state.dart';
-import 'dart:async';
+import 'package:mega_cart/features/auth/login/widget/footer_section.dart';
+import 'package:mega_cart/features/auth/login/widget/login_button.dart';
+import 'package:mega_cart/features/auth/login/widget/login_form.dart';
+import 'package:mega_cart/features/auth/login/widget/logo_header.dart';
+import 'package:mega_cart/features/auth/login/widget/social_section.dart';
+import 'package:mega_cart/features/auth/login/widget/welcome_section.dart';
+import 'package:mega_cart/features/auth/widget/fade_in_delayed.dart';
 
 class LoginView extends StatelessWidget {
   LoginView({super.key});
@@ -75,221 +78,35 @@ class LoginView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 60.h),
-                    FadeInDelayed(
-                      delay: 0,
-                      child: Center(
-                        child: Column(
-                          children: [
-                            Text(
-                              'MEGA',
-                              style: GoogleFonts.playball(
-                                fontSize: 52.sp,
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.primary,
-                                letterSpacing: 2,
-                              ),
-                            ),
-                            Container(
-                              height: 2.h,
-                              width: 50.w,
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.primary,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            Text(
-                              'CART',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w300,
-                                letterSpacing: 10,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    const FadeInDelayed(delay: 0, child: LogoHeader()),
                     SizedBox(height: 40.h),
-                    FadeInDelayed(
-                      delay: 200,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'welcomeBack'.tr,
-                            style: theme.textTheme.headlineMedium?.copyWith(
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      'enterCredentials'.tr,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.primary.withOpacity(0.7),
-                      ),
-                    ),
+                    FadeInDelayed(delay: 200, child: const WelcomeSection()),
                     SizedBox(height: 35.h),
-                    // Input Fields
                     FadeInDelayed(
                       delay: 400,
-                      child: Column(
-                        children: [
-                          CustomTextField(
-                            labelText: 'emailAddress'.tr,
-                            prefixIcon: Icon(
-                              Icons.email_outlined,
-                              color: theme.colorScheme.primary,
-                              size: 20.sp,
-                            ),
-                            obscureText: false,
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
-                            errorText: state.emailError,
-                          ),
-                          SizedBox(height: 25.h),
-                          CustomTextField(
-                            labelText: 'password'.tr,
-                            prefixIcon: Icon(
-                              Icons.lock_open_outlined,
-                              color: theme.colorScheme.primary,
-                              size: 20.sp,
-                            ),
-                            obscureText: state.isPasswordObscured,
-                            controller: _passwordController,
-                            keyboardType: TextInputType.visiblePassword,
-                            textInputAction: TextInputAction.done,
-                            suffixIcon: IconButton(
-                              onPressed: () => context
-                                  .read<LoginCubit>()
-                                  .togglePasswordVisibility(),
-                              icon: Icon(
-                                state.isPasswordObscured
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined,
-                                color: theme.colorScheme.onSurfaceVariant,
-                                size: 20,
-                              ),
-                            ),
-                            errorText: state.passwordError,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'forgotPassword'.tr,
-                          style: TextStyle(
-                            color: theme.colorScheme.primary,
-                            fontSize: 13.sp,
-                          ),
-                        ),
+                      child: LoginForm(
+                        emailController: _emailController,
+                        passwordController: _passwordController,
+                        state: state,
                       ),
                     ),
                     SizedBox(height: 30.h),
-                    // Login Button
                     FadeInDelayed(
                       delay: 600,
-                      child: Center(
-                        child: SizedBox(
-                          width:
-                              200.w, // تقليل العرض ليكون أكثر تناسقاً واحترافية
-                          height: 56.h,
-                          child: ElevatedButton(
-                            onPressed: state.status == LoginStatus.loading
-                                ? null
-                                : () => _onLoginPressed(context),
-                            child: state.status == LoginStatus.loading
-                                ? SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: theme.colorScheme.onPrimary,
-                                    ),
-                                  )
-                                : Text(
-                                    'signIn'.tr,
-                                    style: GoogleFonts.montserrat(
-                                      fontSize: 18.sp,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: 1.1,
-                                    ),
-                                  ),
-                          ),
-                        ),
+                      child: LoginButton(
+                        state: state,
+                        onPressed: () => _onLoginPressed(context),
                       ),
                     ),
                     SizedBox(height: 30.h),
-                    // Social Login Divider
-                    FadeInDelayed(
-                      delay: 800,
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Divider(
-                                  color: theme.colorScheme.outlineVariant,
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                                child: Text(
-                                  "orContinueWith".tr,
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 12.sp,
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Divider(
-                                  color: theme.colorScheme.outlineVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 24.h),
-                          // استخدام الويدجت الموحد
-                          const SocialLoginButtons(),
-                        ],
-                      ),
-                    ),
+                    FadeInDelayed(delay: 800, child: SocialSection()),
                     SizedBox(height: 30.h),
-                    // Footer
                     FadeInDelayed(
                       delay: 1000,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "newHere".tr,
-                            style: GoogleFonts.montserrat(
-                              color: theme.colorScheme.onSurfaceVariant,
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () => Get.toNamed(AppRoutes.signup),
-                            child: Text(
-                              "createAccount".tr,
-                              style: GoogleFonts.montserrat(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.primary,
-                                decoration: TextDecoration.none,
-                              ),
-                            ),
-                          ),
-                        ],
+                      child: FooterSection(
+                        text1: 'newHere',
+                        text2: 'createAccount',
+                        onTap: () => Get.toNamed(AppRoutes.signup),
                       ),
                     ),
                     SizedBox(height: 20.h),
@@ -300,57 +117,6 @@ class LoginView extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class FadeInDelayed extends StatefulWidget {
-  final Widget child;
-  final int delay;
-  const FadeInDelayed({super.key, required this.child, required this.delay});
-
-  @override
-  State<FadeInDelayed> createState() => _FadeInDelayedState();
-}
-
-class _FadeInDelayedState extends State<FadeInDelayed>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _opacity;
-  late Animation<Offset> _offset;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _opacity = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
-    _offset = Tween<Offset>(
-      begin: const Offset(0, 0.1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
-
-    Timer(Duration(milliseconds: widget.delay), () {
-      if (mounted) _controller.forward();
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _opacity,
-      child: SlideTransition(position: _offset, child: widget.child),
     );
   }
 }

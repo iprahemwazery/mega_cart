@@ -47,7 +47,7 @@ class LoginCubit extends Cubit<LoginState> {
       await SessionManager.setLoggedIn(token, email.trim());
       emit(state.copyWith(status: LoginStatus.success, token: token));
     } on DioException catch (error) {
-      String message = 'loginError'; // مفتاح ترجمة افتراضي
+      String message = 'loginError';
       if (error.response != null && error.response?.data != null) {
         message = error.response?.data.toString() ?? message;
       }
@@ -56,7 +56,7 @@ class LoginCubit extends Cubit<LoginState> {
       emit(
         state.copyWith(
           status: LoginStatus.failure,
-          errorMessage: 'serverConnectionFailed', // مفتاح الترجمة
+          errorMessage: 'serverConnectionFailed',
         ),
       );
     }

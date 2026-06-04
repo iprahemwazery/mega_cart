@@ -8,10 +8,7 @@ class CategoryCubit extends Cubit<CategoryState> {
   void getCategories() async {
     emit(state.copyWith(status: CategoryStatus.loading));
     try {
-      // Simulate API call or use dummy data from StaticCategoriesContent
-      await Future.delayed(
-        const Duration(seconds: 1),
-      ); // Simulate network delay
+      await Future.delayed(const Duration(seconds: 1));
       final List<Category> fetchedCategories = [
         const Category(
           id: '1',

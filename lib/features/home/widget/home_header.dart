@@ -105,8 +105,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                           focusNode: _searchFocusNode,
                           autofocus: true,
                           style: TextStyle(color: colorScheme.onSurface),
-                          textInputAction: TextInputAction
-                              .search, // تغيير زر الـ Enter لأيقونة بحث
+                          textInputAction: TextInputAction.search,
                           decoration: InputDecoration(
                             hintText: 'searchResults'.tr,
                             border: InputBorder.none,
@@ -119,16 +118,15 @@ class _HomeHeaderState extends State<HomeHeader> {
                                     ),
                                     onPressed: () {
                                       _searchController.clear();
+                                      widget.onSearchModeChanged?.call(false);
                                       widget.onSearchChanged?.call('');
-                                      setState(
-                                        () {},
-                                      ); // لتحديث الواجهة وإخفاء الزر
+                                      setState(() {});
                                     },
                                   )
                                 : null,
                           ),
                           onChanged: (value) {
-                            setState(() {}); // لإظهار زر X عند بدء الكتابة
+                            setState(() {});
                             widget.onSearchChanged?.call(value);
                           },
                           onSubmitted: (value) {
@@ -141,7 +139,6 @@ class _HomeHeaderState extends State<HomeHeader> {
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // الجانب الأيسر: صورة المستخدم، الاسم، البريد الإلكتروني
                       Row(
                         children: [
                           CircleAvatar(
@@ -207,89 +204,92 @@ class _HomeHeaderState extends State<HomeHeader> {
                       ),
                     ],
                   ),
-            const SizedBox(height: 30),
-            Row(
-              children: [
-                Spacer(),
-                TextButton(
-                  onPressed: widget.onHomePressed,
-                  style: TextButton.styleFrom(
-                    backgroundColor: !widget.showCategories
-                        ? colorScheme.primary
-                        : colorScheme.surfaceVariant,
-                    foregroundColor: !widget.showCategories
-                        ? colorScheme.onPrimary
-                        : colorScheme.onSurfaceVariant,
-                  ),
-                  child: Text('home'.tr),
-                ),
-                Spacer(),
-                TextButton(
-                  onPressed: widget.onCategoryPressed,
-                  style: TextButton.styleFrom(
-                    backgroundColor: widget.showCategories
-                        ? colorScheme.primary
-                        : colorScheme.surfaceVariant,
-                    foregroundColor: widget.showCategories
-                        ? colorScheme.onPrimary
-                        : colorScheme.onSurfaceVariant,
-                  ),
-                  child: Text('account'.tr),
-                ),
-                Spacer(),
-              ],
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              height: 150,
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: 3,
-                onPageChanged: (index) {
-                  _currentPage.value = index;
-                },
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return const PromoCard(
-                      promoText: '24% off Shipping today \n on bag purchase',
-                      byText: 'by, MegaCart',
-                    );
-                  } else if (index == 1) {
-                    return const PromoCard(
-                      promoText: 'Summer Sale! Up to 50% off \n selected items',
-                      byText: 'by, MegaCart Deals',
-                    );
-                  } else {
-                    return const PromoCard(
-                      promoText:
-                          'New Arrivals! Explore \n our latest collection',
-                      byText: 'by, MegaCart Fashion',
-                    );
-                  }
-                },
-              ),
-            ),
-            const SizedBox(height: 10),
-            Obx(
-              () => Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  3,
-                  (index) => AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    height: 8,
-                    width: _currentPage.value == index ? 24 : 8,
-                    decoration: BoxDecoration(
-                      color: _currentPage.value == index
+            if (!widget.isSearching) ...[
+              const SizedBox(height: 30),
+              Row(
+                children: [
+                  const Spacer(),
+                  TextButton(
+                    onPressed: widget.onHomePressed,
+                    style: TextButton.styleFrom(
+                      backgroundColor: !widget.showCategories
                           ? colorScheme.primary
-                          : colorScheme.outlineVariant,
-                      borderRadius: BorderRadius.circular(4),
+                          : colorScheme.surfaceVariant,
+                      foregroundColor: !widget.showCategories
+                          ? colorScheme.onPrimary
+                          : colorScheme.onSurfaceVariant,
+                    ),
+                    child: Text('home'.tr),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: widget.onCategoryPressed,
+                    style: TextButton.styleFrom(
+                      backgroundColor: widget.showCategories
+                          ? colorScheme.primary
+                          : colorScheme.surfaceVariant,
+                      foregroundColor: widget.showCategories
+                          ? colorScheme.onPrimary
+                          : colorScheme.onSurfaceVariant,
+                    ),
+                    child: Text('account'.tr),
+                  ),
+                  const Spacer(),
+                ],
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                height: 150,
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: 3,
+                  onPageChanged: (index) {
+                    _currentPage.value = index;
+                  },
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return const PromoCard(
+                        promoText: '24% off Shipping today \n on bag purchase',
+                        byText: 'by, MegaCart',
+                      );
+                    } else if (index == 1) {
+                      return const PromoCard(
+                        promoText:
+                            'Summer Sale! Up to 50% off \n selected items',
+                        byText: 'by, MegaCart Deals',
+                      );
+                    } else {
+                      return const PromoCard(
+                        promoText:
+                            'New Arrivals! Explore \n our latest collection',
+                        byText: 'by, MegaCart Fashion',
+                      );
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 10),
+              Obx(
+                () => Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    3,
+                    (index) => AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      height: 8,
+                      width: _currentPage.value == index ? 24 : 8,
+                      decoration: BoxDecoration(
+                        color: _currentPage.value == index
+                            ? colorScheme.primary
+                            : colorScheme.outlineVariant,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ),

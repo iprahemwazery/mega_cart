@@ -25,8 +25,8 @@ import 'package:mega_cart/features/cart/cubit/cart_cubit.dart';
 import 'package:mega_cart/features/auth/login/cubit/login_cubit.dart';
 import 'package:mega_cart/features/auth/signup/cubit/signup_cubit.dart';
 import 'package:mega_cart/features/cart/data/cart_repository_impl.dart';
-import 'package:mega_cart/l10n/app_translations.dart';
-import 'package:mega_cart/l10n/app_localizations.dart';
+import 'package:mega_cart/core/l10n/app_translations.dart';
+import 'package:mega_cart/core/l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,8 +42,8 @@ class MyApp extends StatelessWidget {
     final dio = Dio(
       BaseOptions(
         baseUrl: ApiConstans.baseUrl,
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 10),
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
         headers: {'Accept': 'application/json'},
       ),
     );

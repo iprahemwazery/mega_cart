@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mega_cart/features/settings/view/settings_controller.dart';
-import 'package:mega_cart/l10n/app_localizations.dart';
+import 'package:mega_cart/core/l10n/app_localizations.dart';
 
 class SttingsView extends StatelessWidget {
   const SttingsView({super.key});

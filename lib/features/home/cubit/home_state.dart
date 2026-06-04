@@ -6,6 +6,7 @@ enum HomeStatus { initial, loading, success, failure }
 class HomeState extends Equatable {
   final HomeStatus status;
   final List<Product> products;
+  final List<Product> allAvailableProducts;
   final List<String> searchHistory;
   final bool showCategories;
   final bool isSearchOverlayVisible;
@@ -22,6 +23,7 @@ class HomeState extends Equatable {
   const HomeState({
     this.status = HomeStatus.initial,
     this.products = const [],
+    this.allAvailableProducts = const [],
     this.searchHistory = const [],
     this.showCategories = false,
     this.isSearchOverlayVisible = false,
@@ -39,6 +41,7 @@ class HomeState extends Equatable {
   HomeState copyWith({
     HomeStatus? status,
     List<Product>? products,
+    List<Product>? allAvailableProducts,
     List<String>? searchHistory,
     bool? showCategories,
     bool? isSearchOverlayVisible,
@@ -55,6 +58,7 @@ class HomeState extends Equatable {
     return HomeState(
       status: status ?? this.status,
       products: products ?? this.products,
+      allAvailableProducts: allAvailableProducts ?? this.allAvailableProducts,
       searchHistory: searchHistory ?? this.searchHistory,
       showCategories: showCategories ?? this.showCategories,
       isSearchOverlayVisible:
@@ -75,6 +79,7 @@ class HomeState extends Equatable {
   List<Object?> get props => [
     status,
     products,
+    allAvailableProducts,
     searchHistory,
     showCategories,
     isSearchOverlayVisible,

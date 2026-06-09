@@ -5,7 +5,9 @@ import 'package:mega_cart/features/favorites/cubit/favorites_cubit.dart';
 import 'package:mega_cart/features/favorites/cubit/favorites_state.dart';
 import 'package:mega_cart/features/singelProfuct/cubit/product_details_cubit.dart';
 import 'package:mega_cart/features/singelProfuct/cubit/product_details_state.dart';
+import 'package:mega_cart/core/app_router.dart';
 import 'package:mega_cart/core/customs/shimmer_loading.dart';
+import 'package:mega_cart/features/order/view/page_animation_wrapper.dart';
 import '../widget/product_description_section.dart';
 import '../widget/product_image_section.dart';
 import '../widget/product_info_section.dart';
@@ -43,23 +45,39 @@ class ProductDetailsView extends StatelessWidget {
                 Positioned(
                   top: 45,
                   right: 15,
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white.withOpacity(0.7),
-                    child: BlocBuilder<FavoritesCubit, FavoritesState>(
-                      builder: (context, favState) {
-                        final isFav = context.read<FavoritesCubit>().isFavorite(
-                          state.product.id,
-                        );
-                        return IconButton(
-                          onPressed: () => context
-                              .read<FavoritesCubit>()
-                              .toggleFavorite(state.product),
-                          icon: Icon(
-                            isFav ? Icons.favorite : Icons.favorite_border,
-                            color: isFav ? Colors.red : Colors.black,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        BlocBuilder<FavoritesCubit, FavoritesState>(
+                          builder: (context, favState) {
+                            final isFav = context
+                                .read<FavoritesCubit>()
+                                .isFavorite(state.product.id);
+                            return IconButton(
+                              onPressed: () => context
+                                  .read<FavoritesCubit>()
+                                  .toggleFavorite(state.product),
+                              icon: Icon(
+                                isFav ? Icons.favorite : Icons.favorite_border,
+                                color: isFav ? Colors.red : Colors.black,
+                              ),
+                            );
+                          },
+                        ),
+                        IconButton(
+                          onPressed: () =>
+                              _confirmDelete(context, state.product.id),
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.black,
                           ),
-                        );
-                      },
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -79,25 +97,30 @@ class ProductDetailsView extends StatelessWidget {
       final currentQuantity = state.quantity;
       final theme = Theme.of(context);
       return SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ProductImageSection(product: product),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ProductInfoSection(product: product, theme: theme),
-                  const SizedBox(height: 20),
-                  ProductQuantitySelector(currentQuantity: currentQuantity),
-                  const SizedBox(height: 25),
-                  ProductDescriptionSection(product: product, theme: theme),
-                  const SizedBox(height: 30),
-                ],
-              ),
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: PageAnimationWrapper.staggeredList(
+              children: [
+                ProductImageSection(product: product),
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ProductInfoSection(product: product, theme: theme),
+                      const SizedBox(height: 20),
+                      ProductQuantitySelector(currentQuantity: currentQuantity),
+                      const SizedBox(height: 25),
+                      ProductDescriptionSection(product: product, theme: theme),
+                      const SizedBox(height: 30),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       );
     } else if (state is ProductDetailsError) {
@@ -124,6 +147,43 @@ class ProductDetailsView extends StatelessWidget {
       product: product,
       currentQuantity: currentQuantity,
       theme: theme,
+    );
+  }
+
+  void _confirmDelete(BuildContext context, String productId) {
+    Get.defaultDialog(
+      title: 'deleteProductTitle'.tr,
+      middleText: 'deleteProductConfirmation'.tr,
+      textCancel: 'cancelButton'.tr,
+      textConfirm: 'deleteButton'.tr,
+      confirmTextColor: Colors.white,
+      onConfirm: () async {
+        Get.back();
+        final result = await context.read<ProductDetailsCubit>().deleteProduct(
+          productId,
+        );
+        result.fold(
+          (failure) {
+            Get.snackbar(
+              'errorTitle'.tr,
+              failure.message,
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+            );
+          },
+          (_) {
+            Get.offAllNamed(AppRoutes.root);
+            Get.snackbar(
+              'successTitle'.tr,
+              'productDeletedSuccess'.tr,
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.green,
+              colorText: Colors.white,
+            );
+          },
+        );
+      },
     );
   }
 }

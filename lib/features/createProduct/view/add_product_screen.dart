@@ -82,7 +82,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
           listener: (context, state) {
             if (state is AddProductSuccess) {
               GlassSnackbar.show(message: 'تمت إضافة المنتج بنجاح');
-              // مسح الحقول بعد الإضافة بنجاح
               _sellerIdController.clear();
               _tokenController.clear();
               _nameController.clear();

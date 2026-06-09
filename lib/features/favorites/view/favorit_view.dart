@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mega_cart/features/favorites/cubit/favorites_cubit.dart';
 import 'package:mega_cart/features/favorites/cubit/favorites_state.dart';
 import 'package:mega_cart/features/home/widget/product_card.dart';
-import 'package:get/get.dart'; // Import GetX for translations
+import 'package:mega_cart/features/order/view/page_animation_wrapper.dart';
+import 'package:get/get.dart';
 
 class FavoritView extends StatefulWidget {
   const FavoritView({super.key});
@@ -19,7 +20,6 @@ class _FavoritViewState extends State<FavoritView>
 
   @override
   Widget build(BuildContext context) {
-    // ضروري جداً استدعاء super.build عند استخدام Mixin الحفاظ على الحالة
     super.build(context);
 
     return Scaffold(
@@ -56,7 +56,12 @@ class _FavoritViewState extends State<FavoritView>
             ),
             itemCount: state.favorites.length,
             itemBuilder: (context, index) {
-              return ProductCard(product: state.favorites[index]);
+              final product = state.favorites[index];
+              return PageAnimationWrapper(
+                index: index,
+                delay: Duration(milliseconds: 50 * index),
+                child: ProductCard(product: product),
+              );
             },
           );
         },

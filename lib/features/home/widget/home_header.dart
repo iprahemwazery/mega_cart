@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart'; // يمكن استخدامها للتنقل أو إظهار الـ snackbar
 import 'package:mega_cart/features/home/widget/promo_card.dart';
 
 class HomeHeader extends StatefulWidget {
   final String userEmail;
+  final String? userImageUrl; // متغير جديد لرابط الصورة
 
   // Callbacks for button presses
   final VoidCallback onHomePressed;
@@ -17,6 +19,7 @@ class HomeHeader extends StatefulWidget {
   const HomeHeader({
     super.key,
     required this.userEmail,
+    this.userImageUrl,
     required this.onHomePressed,
     required this.onCategoryPressed,
     required this.showCategories,
@@ -74,16 +77,12 @@ class _HomeHeaderState extends State<HomeHeader> {
     final colorScheme = theme.colorScheme;
 
     return Container(
-      // تقليل الـ padding لتقليل الارتفاع الكلي
-      padding: const EdgeInsets.symmetric(
-        vertical: 8,
-      ), // إزالة الـ padding الأفقي هنا
-      decoration: const BoxDecoration(
-        color: Colors.transparent, // لون خلفية الرأس
-      ),
+      padding: EdgeInsets.zero,
+      decoration: const BoxDecoration(color: Colors.transparent),
       child: SafeArea(
-        // لضمان عدم تداخل المحتوى مع شريط الحالة (status bar)
+        bottom: false,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             widget.isSearching
                 ? Row(
@@ -143,11 +142,29 @@ class _HomeHeaderState extends State<HomeHeader> {
                         children: [
                           CircleAvatar(
                             radius: 16,
-                            backgroundColor: colorScheme.primaryContainer,
-                            child: const Icon(
-                              Icons.person,
-                              color: Colors.white,
-                              size: 20,
+                            backgroundColor: colorScheme.surfaceVariant,
+                            child: ClipOval(
+                              child: CachedNetworkImage(
+                                imageUrl: widget.userImageUrl ?? '',
+                                fit: BoxFit.cover,
+                                width: 32,
+                                height: 32,
+                                placeholder: (context, url) => Center(
+                                  child: SizedBox(
+                                    width: 12,
+                                    height: 12,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: colorScheme.primary,
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => Icon(
+                                  Icons.person,
+                                  color: colorScheme.onSurfaceVariant,
+                                  size: 20,
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -204,8 +221,9 @@ class _HomeHeaderState extends State<HomeHeader> {
                       ),
                     ],
                   ),
+            const SizedBox(height: 12),
             if (!widget.isSearching) ...[
-              const SizedBox(height: 30),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   const Spacer(),
@@ -237,9 +255,9 @@ class _HomeHeaderState extends State<HomeHeader> {
                   const Spacer(),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               SizedBox(
-                height: 150,
+                height: 110,
                 child: PageView.builder(
                   controller: _pageController,
                   itemCount: 3,
@@ -248,27 +266,36 @@ class _HomeHeaderState extends State<HomeHeader> {
                   },
                   itemBuilder: (context, index) {
                     if (index == 0) {
-                      return const PromoCard(
-                        promoText: '24% off Shipping today \n on bag purchase',
-                        byText: 'by, MegaCart',
+                      return const Align(
+                        alignment: Alignment.topCenter,
+                        child: PromoCard(
+                          promoText:
+                              '24% off Shipping today \n on bag purchase',
+                          byText: 'by, MegaCart',
+                        ),
                       );
                     } else if (index == 1) {
-                      return const PromoCard(
-                        promoText:
-                            'Summer Sale! Up to 50% off \n selected items',
-                        byText: 'by, MegaCart Deals',
+                      return const Align(
+                        alignment: Alignment.topCenter,
+                        child: PromoCard(
+                          promoText:
+                              'Summer Sale! Up to 50% off \n selected items',
+                          byText: 'by, MegaCart Deals',
+                        ),
                       );
                     } else {
-                      return const PromoCard(
-                        promoText:
-                            'New Arrivals! Explore \n our latest collection',
-                        byText: 'by, MegaCart Fashion',
+                      return const Align(
+                        alignment: Alignment.topCenter,
+                        child: PromoCard(
+                          promoText:
+                              'New Arrivals! Explore \n our latest collection',
+                          byText: 'by, MegaCart Fashion',
+                        ),
                       );
                     }
                   },
                 ),
               ),
-              const SizedBox(height: 10),
               Obx(
                 () => Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -289,6 +316,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
             ],
           ],
         ),

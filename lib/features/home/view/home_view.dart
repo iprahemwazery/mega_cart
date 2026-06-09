@@ -47,11 +47,11 @@ class _HomeViewState extends State<HomeView>
       },
       child: Scaffold(
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 14.0),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(height: 8),
-              // BlocSelector for HomeHeader
+              const SizedBox(height: 4),
               BlocSelector<HomeCubit, HomeState, (String, bool, bool)>(
                 selector: (state) => (
                   state.userEmail,
@@ -89,34 +89,39 @@ class _HomeViewState extends State<HomeView>
               ),
               Expanded(
                 child: Stack(
+                  alignment: Alignment.topCenter,
                   children: [
-                    // BlocSelector for CategoriesContent / ProductsContent
-                    BlocSelector<HomeCubit, HomeState, bool>(
-                      selector: (state) => state.showCategories,
-                      builder: (context, showCategories) {
-                        if (showCategories) {
-                          return const CategoriesContent();
-                        } else {
-                          return const ProductsContent();
-                        }
-                      },
+                    Positioned.fill(
+                      child: BlocSelector<HomeCubit, HomeState, bool>(
+                        selector: (state) => state.showCategories,
+                        builder: (context, showCategories) {
+                          if (showCategories) {
+                            return const CategoriesContent();
+                          } else {
+                            return const ProductsContent();
+                          }
+                        },
+                      ),
                     ),
-
-                    // BlocSelector for SearchResultsOverlay
-                    BlocSelector<HomeCubit, HomeState, bool>(
-                      selector: (state) => state.isSearchOverlayVisible,
-                      builder: (context, isSearchOverlayVisible) {
-                        if (isSearchOverlayVisible) {
-                          return BlocSelector<HomeCubit, HomeState, HomeState>(
-                            selector: (state) =>
-                                state, // Pass the whole state to SearchResultsOverlay
-                            builder: (context, searchState) {
-                              return SearchResultsOverlay(state: searchState);
-                            },
-                          );
-                        }
-                        return const SizedBox.shrink();
-                      },
+                    Positioned.fill(
+                      child: BlocSelector<HomeCubit, HomeState, bool>(
+                        selector: (state) => state.isSearchOverlayVisible,
+                        builder: (context, isSearchOverlayVisible) {
+                          if (isSearchOverlayVisible) {
+                            return BlocSelector<
+                              HomeCubit,
+                              HomeState,
+                              HomeState
+                            >(
+                              selector: (state) => state,
+                              builder: (context, searchState) {
+                                return SearchResultsOverlay(state: searchState);
+                              },
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
                     ),
                   ],
                 ),

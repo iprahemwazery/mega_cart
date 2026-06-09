@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import 'package:mega_cart/features/home/cubit/category_cubit.dart';
 import 'package:mega_cart/features/home/cubit/category_state.dart';
+import 'package:mega_cart/features/order/view/page_animation_wrapper.dart';
 import 'package:mega_cart/features/home/widget/static_categories_content.dart';
 
 class CategoriesContent extends StatelessWidget {
@@ -32,17 +34,26 @@ class CategoriesContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: categoryState.categories.length,
-                  itemBuilder: (context, index) {
-                    final category = categoryState.categories[index];
-                    return StaticCategoriesContent.buildCategoryCard(
-                      category,
-                      index,
-                    );
-                  },
+                AnimationLimiter(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: categoryState.categories.length,
+                    itemBuilder: (context, index) {
+                      final category = categoryState.categories[index];
+                      // حساب الـ index المعكوس لظهور الأنميشن من الأسفل للأعلى
+                      final int reversedIndex =
+                          (categoryState.categories.length - 1) - index;
+                      return PageAnimationWrapper(
+                        index: reversedIndex,
+                        delay: Duration(milliseconds: 150 * reversedIndex),
+                        child: StaticCategoriesContent.buildCategoryCard(
+                          category,
+                          index,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),

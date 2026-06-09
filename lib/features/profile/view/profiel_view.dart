@@ -5,12 +5,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/core/customs/snackbar.dart';
+import 'package:mega_cart/features/order/view/page_animation_wrapper.dart';
 import 'package:mega_cart/features/profile/data/profile_conttroller.dart';
 import 'package:mega_cart/features/profile/cubit/profile_cubit.dart';
 import 'package:mega_cart/features/profile/cubit/profile_state.dart';
 import 'package:mega_cart/features/profile/widget/user_remote_data_source.dart';
 import 'package:mega_cart/features/profile/widget/user_repository_impl.dart';
 import 'package:mega_cart/features/settings/view/sttings_view.dart';
+import 'package:mega_cart/core/app_router.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -165,6 +168,24 @@ class ProfileView extends StatelessWidget {
               context,
             ).textTheme.bodyLarge?.copyWith(color: Colors.white70),
           ),
+          const SizedBox(height: 18),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.add_business_outlined),
+              label: Text('addNewProduct'.tr),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Theme.of(context).primaryColor,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              onPressed: () => Get.toNamed(AppRoutes.createProduct),
+            ),
+          ),
         ],
       ),
     );
@@ -173,84 +194,84 @@ class ProfileView extends StatelessWidget {
   Widget _buildProfileActions(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        children: [
-          _buildActionCard(
-            context,
-            icon: Icons.edit,
-            title: 'editProfile'.tr,
-            onTap: () {
-              GlassSnackbar.show(message: 'سيتم فتح صفحة تعديل الملف الشخصي');
-            },
-          ),
-          _buildActionCard(
-            context,
-            icon: Icons.settings,
-            title: 'settings'.tr,
-            onTap: () {
-              Get.bottomSheet(
-                // Wrap SttingsView with a Container to give it a background color
-                // and then apply the shape to the Get.bottomSheet itself.
-                Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).scaffoldBackgroundColor, // Background color for the sheet content
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(25.0),
-                    ),
-                  ),
-
-                  child: const SttingsView(),
-                ),
-                isScrollControlled:
-                    true, // Allows the bottom sheet to take full height if needed
-                backgroundColor:
-                    Colors.transparent, // Important for rounded corners to show
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(25.0),
-                  ),
-                ),
-              );
-            },
-          ),
-          _buildActionCard(
-            context,
-            icon: Icons.notifications,
-            title: 'notifications'.tr,
-            onTap: () {
-              GlassSnackbar.show(message: 'سيتم فتح صفحة الإشعارات');
-            },
-          ),
-          _buildActionCard(
-            context,
-            icon: Icons.help_outline,
-            title: 'helpAndSupport'.tr,
-            onTap: () {
-              GlassSnackbar.show(message: 'سيتم فتح صفحة المساعدة والدعم');
-            },
-          ),
-          _buildActionCard(
-            context,
-            icon: Icons.logout,
-            title: 'logout'.tr,
-            isDestructive: true,
-            onTap: () {
-              Get.defaultDialog(
-                title: 'logout'.tr,
-                middleText: 'logoutConfirmation'.tr,
-                textConfirm: 'yes'.tr,
-                textCancel: 'cancel'.tr,
-                confirmTextColor: Colors.white,
-                onConfirm: () {
-                  ProfileConttroller().logout();
-                  GlassSnackbar.show(message: 'تم تسجيل الخروج بنجاح');
+      child: AnimationLimiter(
+        child: Column(
+          children: PageAnimationWrapper.staggeredList(
+            // عكس ترتيب العناصر لظهور الأنميشن من الأسفل للأعلى
+            children: [
+              _buildActionCard(
+                context,
+                icon: Icons.edit,
+                title: 'editProfile'.tr,
+                onTap: () {
+                  GlassSnackbar.show(message: 'editProfileMessage'.tr);
                 },
-              );
-            },
+              ),
+              _buildActionCard(
+                context,
+                icon: Icons.settings,
+                title: 'settings'.tr,
+                onTap: () {
+                  Get.bottomSheet(
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(25.0),
+                        ),
+                      ),
+                      child: const SttingsView(),
+                    ),
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                  );
+                },
+              ),
+              _buildActionCard(
+                context,
+                icon: Icons.add_circle_outline,
+                title: 'addNewProduct'.tr,
+                onTap: () => Get.toNamed(AppRoutes.createProduct),
+              ),
+              _buildActionCard(
+                context,
+                icon: Icons.notifications,
+                title: 'notifications'.tr,
+                onTap: () {
+                  GlassSnackbar.show(message: 'notificationsMessage'.tr);
+                },
+              ),
+              _buildActionCard(
+                context,
+                icon: Icons.help_outline,
+                title: 'helpAndSupport'.tr,
+                onTap: () {
+                  GlassSnackbar.show(message: 'helpSupportMessage'.tr);
+                },
+              ),
+              _buildActionCard(
+                context,
+                icon: Icons.logout,
+                title: 'logout'.tr,
+                isDestructive: true,
+                onTap: () {
+                  Get.defaultDialog(
+                    title: 'logout'.tr,
+                    middleText: 'logoutConfirmation'.tr,
+                    textConfirm: 'yes'.tr,
+                    textCancel: 'cancel'.tr,
+                    confirmTextColor: Colors.white,
+                    onConfirm: () {
+                      ProfileConttroller().logout();
+                      GlassSnackbar.show(message: 'logoutSuccessMessage'.tr);
+                    },
+                  );
+                },
+              ),
+              const SizedBox(height: 18),
+            ].reversed.toList(),
           ),
-        ],
+        ),
       ),
     );
   }

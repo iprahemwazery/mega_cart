@@ -6,7 +6,19 @@ import 'package:mega_cart/core/models/product.dart';
 import 'package:mega_cart/core/models/create_product_request.dart';
 
 class ProductService {
-  final Dio _dio = Dio();
+  final Dio _dio;
+
+  ProductService({String? token})
+    : _dio = Dio(
+        BaseOptions(
+          baseUrl: ApiConstans.baseUrl,
+          headers: {
+            'Content-Type': 'application/json',
+            if (token != null && token.isNotEmpty)
+              'Authorization': 'Bearer $token',
+          },
+        ),
+      );
 
   Future<ProductResponse> getProducts({
     String? searchTerm,
@@ -20,8 +32,6 @@ class ProductService {
     int pageSize = 10,
   }) async {
     try {
-      final headers = <String, String>{'Content-Type': 'application/json'};
-
       final body = jsonEncode({
         'searchTerm': searchTerm,
         'category': category,
@@ -35,12 +45,8 @@ class ProductService {
       });
 
       final response = await _dio.request(
-        '${ApiConstans.baseUrl}${ApiConstans.products}',
-        options: Options(
-          method: 'GET',
-          headers: headers,
-          contentType: Headers.jsonContentType,
-        ),
+        ApiConstans.products,
+        options: Options(method: 'GET', contentType: Headers.jsonContentType),
         data: body,
       );
 
@@ -64,15 +70,9 @@ class ProductService {
 
   Future<Product> createProduct(CreateProductRequest request) async {
     try {
-      final headers = <String, String>{'Content-Type': 'application/json'};
-
       final response = await _dio.post(
-        '${ApiConstans.baseUrl}${ApiConstans.products}',
-        options: Options(
-          headers: headers,
-          contentType: Headers.jsonContentType,
-        ),
-        data: jsonEncode(request.toJson()),
+        ApiConstans.products,
+        data: request.toJson(),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {

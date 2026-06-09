@@ -24,7 +24,6 @@ class HomeController extends GetxController {
     super.onInit();
     loadUserData();
     loadProducts();
-    // إضافة debounce للانتظار 500ms بعد توقف الكتابة قبل تنفيذ البحث فعلياً
     debounce(
       searchTerm,
       (_) => loadProducts(),

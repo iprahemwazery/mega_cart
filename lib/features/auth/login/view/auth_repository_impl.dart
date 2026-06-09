@@ -37,8 +37,8 @@ class AuthRepositoryImpl implements AuthRepository {
           error: response.data.toString(),
         );
       }
-    } on DioException {
-      rethrow; // Re-throw DioException to be handled by Cubit
+    } on DioException catch (e) {
+      throw e; // Re-throw DioException to be handled by Cubit
     } catch (e) {
       throw Exception('Server connection failed'); // Generic error
     }
@@ -68,8 +68,8 @@ class AuthRepositoryImpl implements AuthRepository {
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw Exception(response.data.toString());
       }
-    } on DioException {
-      rethrow;
+    } on DioException catch (e) {
+      throw e;
     } catch (e) {
       throw Exception('Server connection failed');
     }
@@ -101,8 +101,10 @@ class AuthRepositoryImpl implements AuthRepository {
           error: response.data.toString(),
         );
       }
+    } on DioException catch (e) {
+      throw e;
     } catch (e) {
-      rethrow;
+      throw Exception('Server connection failed');
     }
   }
 }

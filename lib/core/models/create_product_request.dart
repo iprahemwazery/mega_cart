@@ -9,7 +9,7 @@ class CreateProductRequest {
   final int stock;
   final double weight;
   final String color;
-  final double discountPercentage;
+  final int discountPercentage;
   final List<String> categoryIds;
   final List<String> productPictureUrls;
 

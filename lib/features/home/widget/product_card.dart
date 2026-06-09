@@ -13,7 +13,6 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        // الانتقال لصفحة التفاصيل وتمرير الـ ID
         Get.toNamed(AppRoutes.detail, arguments: product.id);
       },
       child: Card(
@@ -73,22 +72,28 @@ class ProductCard extends StatelessWidget {
                       // Price
                       Row(
                         children: [
-                          Text(
-                            '\$${product.price.toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
+                          Flexible(
+                            child: Text(
+                              '\$${product.price.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           if (product.discountPercentage > 0) ...[
-                            const SizedBox(width: 8),
-                            Text(
-                              '\$${(product.price / (1 - product.discountPercentage / 100)).toStringAsFixed(2)}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                                decoration: TextDecoration.lineThrough,
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                '\$${(product.price / (1 - product.discountPercentage / 100)).toStringAsFixed(2)}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                  decoration: TextDecoration.lineThrough,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],

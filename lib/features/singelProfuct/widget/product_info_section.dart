@@ -29,6 +29,8 @@ class ProductInfoSection extends StatelessWidget {
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             Text(
@@ -46,9 +48,13 @@ class ProductInfoSection extends StatelessWidget {
           children: [
             const Icon(Icons.star, color: Colors.amber, size: 20),
             const SizedBox(width: 5),
-            Text(
-              '${product.rating} (${product.reviewsCount} ${'reviews'.tr})',
-              style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+            Flexible(
+              child: Text(
+                '${product.rating} (${product.reviewsCount} ${'reviews'.tr})',
+                style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             const Spacer(),
             Text(

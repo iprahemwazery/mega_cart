@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mega_cart/core/app_router.dart';
 import 'package:mega_cart/features/settings/view/settings_controller.dart';
 import 'package:mega_cart/core/l10n/app_localizations.dart';
 
@@ -49,7 +50,7 @@ class SttingsView extends StatelessWidget {
                 ),
                 subtitle: Text(
                   controller.isDarkMode.value ? l10n.enabled : l10n.disabled,
-                  style: TextStyle(fontSize: 12),
+                  style: const TextStyle(fontSize: 12),
                 ),
                 leading: Container(
                   padding: const EdgeInsets.all(8),
@@ -72,6 +73,42 @@ class SttingsView extends StatelessWidget {
               ),
             );
           }),
+
+          const SizedBox(height: 16),
+          Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            color: theme.colorScheme.surfaceVariant.withOpacity(0.35),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+              leading: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withOpacity(0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.add_shopping_cart,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              title: Text(
+                'addNewProduct'.tr,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+              subtitle: Text(
+                'addNewProductDescription'.tr,
+                style: const TextStyle(fontSize: 12),
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () => Get.toNamed(AppRoutes.createProduct),
+            ),
+          ),
 
           const SizedBox(height: 20),
           const Divider(),

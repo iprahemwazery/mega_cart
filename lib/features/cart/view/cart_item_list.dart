@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mega_cart/features/cart/cubit/cart_cubit.dart';
 import 'package:mega_cart/features/cart/cubit/cart_state.dart';
 import 'package:mega_cart/features/settings/view/cart_item_card.dart';
+import 'package:mega_cart/features/order/view/page_animation_wrapper.dart';
 
 class CartItemList extends StatelessWidget {
   const CartItemList({super.key});
@@ -23,24 +24,28 @@ class CartItemList extends StatelessWidget {
                 orElse: () => throw Exception('Item not found'),
               );
 
-              // ignore: unnecessary_null_comparison
               if (cartItem == null) return const SizedBox.shrink();
 
-              return CartItemCard(
-                name: product.name,
-                price: product.price,
-                imageUrl: product.coverPictureUrl,
-                quantity: cartItem.quantity,
-                onAdd: () =>
-                    context.read<CartCubit>().addToCart(product, quantity: 1),
-                onRemove: () => cartItem.quantity > 1
-                    ? context.read<CartCubit>().updateQuantity(
-                        cartItem.id,
-                        cartItem.quantity - 1,
-                      )
-                    : null,
-                onDelete: () =>
-                    context.read<CartCubit>().deleteCartItem(cartItem.id),
+              final int reversedIndex = (state.cartProducts.length - 1) - index;
+              return PageAnimationWrapper(
+                index: reversedIndex,
+                delay: Duration(milliseconds: 100 * reversedIndex),
+                child: CartItemCard(
+                  name: product.name,
+                  price: product.price,
+                  imageUrl: product.coverPictureUrl,
+                  quantity: cartItem.quantity,
+                  onAdd: () =>
+                      context.read<CartCubit>().addToCart(product, quantity: 1),
+                  onRemove: () => cartItem.quantity > 1
+                      ? context.read<CartCubit>().updateQuantity(
+                          cartItem.id,
+                          cartItem.quantity - 1,
+                        )
+                      : null,
+                  onDelete: () =>
+                      context.read<CartCubit>().deleteCartItem(cartItem.id),
+                ),
               );
             },
           ),

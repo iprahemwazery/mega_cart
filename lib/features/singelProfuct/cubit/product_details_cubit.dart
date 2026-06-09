@@ -50,4 +50,8 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
       updateQuantity((state as ProductDetailsSuccess).quantity - 1);
     }
   }
+
+  Future<Either<Failure, dynamic>> deleteProduct(String id) async {
+    return await repository.deleteProduct(id);
+  }
 }

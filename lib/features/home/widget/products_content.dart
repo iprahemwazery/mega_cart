@@ -7,6 +7,7 @@ import 'package:mega_cart/core/models/product.dart';
 import 'package:mega_cart/features/home/cubit/home_cubit.dart';
 import 'package:mega_cart/features/home/cubit/home_state.dart';
 import 'package:mega_cart/features/home/widget/product_card.dart';
+import 'package:mega_cart/features/order/view/page_animation_wrapper.dart';
 
 class ProductsContent extends StatelessWidget {
   const ProductsContent({super.key});
@@ -39,6 +40,7 @@ class ProductsContent extends StatelessWidget {
 
         if (status == HomeStatus.loading && products.isEmpty) {
           return GridView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(vertical: 16),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
@@ -52,11 +54,13 @@ class ProductsContent extends StatelessWidget {
         }
 
         return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'newArrivals'.tr,
+                'New Arrivals'.tr,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.onSurface,
@@ -69,7 +73,7 @@ class ProductsContent extends StatelessWidget {
                     context.read<HomeCubit>().loadProducts(isRefresh: true),
                 child: GridView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.only(bottom: 16),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     childAspectRatio: 0.75,
@@ -91,10 +95,16 @@ class ProductsContent extends StatelessWidget {
                       return const SizedBox.shrink();
                     }
                     final product = products[index];
-                    return GestureDetector(
-                      onTap: () =>
-                          Get.toNamed(AppRoutes.detail, arguments: product.id),
-                      child: ProductCard(product: product),
+                    return PageAnimationWrapper(
+                      index: index,
+                      delay: Duration(milliseconds: 50 * index),
+                      child: GestureDetector(
+                        onTap: () => Get.toNamed(
+                          AppRoutes.detail,
+                          arguments: product.id,
+                        ),
+                        child: ProductCard(product: product),
+                      ),
                     );
                   },
                 ),

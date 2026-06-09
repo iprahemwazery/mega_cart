@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mega_cart/core/utils/app_colors.dart';
 import 'package:mega_cart/core/utils/app_text_styles.dart';
 import 'package:mega_cart/features/createProduct/controller/create_product_controller.dart';
 
@@ -11,83 +10,174 @@ class CreateProductView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('إنشاء منتج جديد'), centerTitle: true),
+      appBar: AppBar(
+        title: Text('createProductTitle'.tr),
+        centerTitle: true,
+        backgroundColor: theme.colorScheme.surface,
+        foregroundColor: theme.colorScheme.onSurface,
+        elevation: 0,
+      ),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildTextField(
+              theme: theme,
               controller: controller.nameController,
-              label: 'اسم المنتج',
-              hint: 'أدخل اسم المنتج بالإنجليزية',
+              label: 'productNameLabel'.tr,
+              hint: 'productNameHintEnglish'.tr,
             ),
             const SizedBox(height: 16),
             _buildTextField(
+              theme: theme,
               controller: controller.nameArabicController,
-              label: 'اسم المنتج (عربي)',
-              hint: 'أدخل اسم المنتج بالعربية',
+              label: 'productNameLabelArabic'.tr,
+              hint: 'productNameHintArabic'.tr,
             ),
             const SizedBox(height: 16),
             _buildTextField(
+              theme: theme,
               controller: controller.descriptionController,
-              label: 'الوصف',
-              hint: 'أدخل وصف المنتج بالإنجليزية',
+              label: 'descriptionLabel'.tr,
+              hint: 'descriptionHintEnglish'.tr,
               maxLines: 3,
             ),
             const SizedBox(height: 16),
             _buildTextField(
+              theme: theme,
               controller: controller.descriptionArabicController,
-              label: 'الوصف (عربي)',
-              hint: 'أدخل وصف المنتج بالعربية',
+              label: 'descriptionLabelArabic'.tr,
+              hint: 'descriptionHintArabic'.tr,
               maxLines: 3,
             ),
             const SizedBox(height: 16),
             _buildTextField(
+              theme: theme,
               controller: controller.coverPictureUrlController,
-              label: 'رابط الصورة الرئيسية',
+              label: 'mainImageUrlLabel'.tr,
               hint: 'https://example.com/image.jpg',
             ),
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: controller.coverPictureUrlController,
+              builder: (context, value, _) {
+                final url = value.text.trim();
+                if (url.isEmpty) return const SizedBox.shrink();
+                final uri = Uri.tryParse(url);
+                if (uri == null || !uri.isAbsolute) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                    child: Text(
+                      'invalidUrlPreview'.tr,
+                      style: AppTextStyles.hint.copyWith(
+                        color: theme.hintColor,
+                      ),
+                    ),
+                  );
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      url,
+                      height: 160,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stack) => Container(
+                        height: 160,
+                        color: Colors.grey[200],
+                        child: Center(
+                          child: Text(
+                            'errorLoadingImage'.tr,
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: 16),
             _buildTextField(
+              theme: theme,
+              controller: controller.discountController,
+              label: 'discountPercentageLabel'.tr,
+              hint: '5',
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              theme: theme,
               controller: controller.priceController,
-              label: 'السعر',
+              label: 'priceLabel'.tr,
               hint: '99.99',
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 16),
             _buildTextField(
+              theme: theme,
               controller: controller.stockController,
-              label: 'الكمية',
+              label: 'stockLabel'.tr,
               hint: '100',
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 16),
             _buildTextField(
+              theme: theme,
               controller: controller.weightController,
-              label: 'الوزن',
+              label: 'weightLabel'.tr,
               hint: '1.5',
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 16),
             _buildTextField(
+              theme: theme,
               controller: controller.colorController,
-              label: 'اللون',
-              hint: 'أحمر',
+              label: 'colorLabel'.tr,
+              hint: 'colorHint'.tr,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'authenticationInfoTitle'.tr,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 8),
+            _buildTextField(
+              theme: theme,
+              controller: controller.tokenController,
+              label: 'tokenLabelOptional'.tr,
+              hint: 'tokenHint'.tr,
             ),
             const SizedBox(height: 16),
             _buildTextField(
+              theme: theme,
               controller: controller.sellerIdController,
-              label: 'معرف البائع',
+              label: 'sellerIdLabelRequired'.tr,
               hint: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
             ),
+            const SizedBox(height: 8),
+            Text(
+              'sellerIdRequiredMessage'.tr,
+              style: AppTextStyles.hint.copyWith(color: theme.hintColor),
+            ),
             const SizedBox(height: 24),
-            _buildCategorySection(),
+            _buildCategorySection(theme),
             const SizedBox(height: 24),
-            _buildPictureUrlsSection(),
+            _buildPictureUrlsSection(theme),
             const SizedBox(height: 32),
-            _buildSubmitButton(),
+            _buildQuickActions(theme),
+            const SizedBox(height: 12),
+            _buildSubmitButton(theme),
             const SizedBox(height: 16),
           ],
         ),
@@ -95,7 +185,58 @@ class CreateProductView extends StatelessWidget {
     );
   }
 
+  Widget _buildQuickActions(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'quickActionsTitle'.tr,
+          style: AppTextStyles.titleMedium.copyWith(
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => controller.fillWithSampleData(),
+                icon: const Icon(Icons.auto_awesome),
+                label: Text('fillFieldsOnlyButton'.tr),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: theme.colorScheme.primary,
+                  side: BorderSide(color: theme.colorScheme.outline),
+                  backgroundColor: theme.colorScheme.surface,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () => controller.fillAndSubmitSample(),
+                icon: const Icon(Icons.send),
+                label: Text('fillAndSubmitProductButton'.tr),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'quickActionsDescription'.tr,
+          style: AppTextStyles.bodySmall.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildTextField({
+    required ThemeData theme,
     required TextEditingController controller,
     required String label,
     required String hint,
@@ -105,26 +246,37 @@ class CreateProductView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTextStyles.titleMedium),
+        Text(
+          label,
+          style: AppTextStyles.titleMedium.copyWith(
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
           keyboardType: keyboardType,
           maxLines: maxLines,
+          style: TextStyle(color: theme.colorScheme.onSurface),
           decoration: InputDecoration(
+            filled: true,
+            fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.3),
             hintText: hint,
-            hintStyle: AppTextStyles.hint,
+            hintStyle: AppTextStyles.hint.copyWith(color: theme.hintColor),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.borderLight),
+              borderSide: BorderSide(color: theme.colorScheme.outline),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.borderLight),
+              borderSide: BorderSide(color: theme.colorScheme.outline),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderSide: BorderSide(
+                color: theme.colorScheme.primary,
+                width: 2,
+              ),
             ),
             contentPadding: const EdgeInsets.all(12),
           ),
@@ -133,11 +285,16 @@ class CreateProductView extends StatelessWidget {
     );
   }
 
-  Widget _buildCategorySection() {
+  Widget _buildCategorySection(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('فئات المنتج', style: AppTextStyles.titleMedium),
+        Text(
+          'productCategoriesTitle'.tr,
+          style: AppTextStyles.titleMedium.copyWith(
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
         const SizedBox(height: 8),
         Obx(() {
           return Wrap(
@@ -145,14 +302,24 @@ class CreateProductView extends StatelessWidget {
             children: [
               ...controller.categoryIds.map(
                 (id) => Chip(
-                  label: Text(id),
+                  label: Text(id, style: theme.textTheme.bodyMedium),
+                  backgroundColor: theme.colorScheme.surfaceVariant,
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 10),
                   onDeleted: () => controller.removeCategory(id),
-                  deleteIcon: const Icon(Icons.close, size: 18),
+                  deleteIcon: Icon(
+                    Icons.close,
+                    size: 18,
+                    color: theme.colorScheme.error,
+                  ),
                 ),
               ),
               ActionChip(
-                onPressed: () => _showAddCategoryDialog(),
-                label: const Text('إضافة فئة'),
+                onPressed: () => _showAddCategoryDialog(theme),
+                label: Text('addCategoryButton'.tr),
+                backgroundColor: theme.colorScheme.primary.withOpacity(0.12),
+                labelStyle: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.primary,
+                ),
               ),
             ],
           );
@@ -161,11 +328,16 @@ class CreateProductView extends StatelessWidget {
     );
   }
 
-  Widget _buildPictureUrlsSection() {
+  Widget _buildPictureUrlsSection(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('روابط الصور الإضافية', style: AppTextStyles.titleMedium),
+        Text(
+          'additionalImageUrlsTitle'.tr,
+          style: AppTextStyles.titleMedium.copyWith(
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
         const SizedBox(height: 8),
         Obx(() {
           return Column(
@@ -174,9 +346,14 @@ class CreateProductView extends StatelessWidget {
                 (url) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: ListTile(
-                    title: Text(url, style: AppTextStyles.bodySmall),
+                    title: Text(
+                      url,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
+                      icon: Icon(Icons.delete, color: theme.colorScheme.error),
                       onPressed: () => controller.removeProductPictureUrl(url),
                     ),
                   ),
@@ -185,9 +362,13 @@ class CreateProductView extends StatelessWidget {
               if (controller.productPictureUrls.isNotEmpty)
                 const SizedBox(height: 8),
               ElevatedButton.icon(
-                onPressed: () => _showAddPictureDialog(),
+                onPressed: () => _showAddPictureDialog(theme),
                 icon: const Icon(Icons.add_a_photo),
-                label: const Text('إضافة صورة'),
+                label: Text('addImageButton'.tr),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
+                ),
               ),
             ],
           );
@@ -196,14 +377,15 @@ class CreateProductView extends StatelessWidget {
     );
   }
 
-  Widget _buildSubmitButton() {
+  Widget _buildSubmitButton(ThemeData theme) {
     return Obx(() {
       return SizedBox(
         width: double.infinity,
         height: 50,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.success,
+            backgroundColor: theme.colorScheme.secondary,
+            foregroundColor: theme.colorScheme.onSecondary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -211,28 +393,38 @@ class CreateProductView extends StatelessWidget {
           onPressed: controller.isLoading.value
               ? null
               : () => controller.createProduct(),
-          child: controller.isLoading.value
-              ? const CircularProgressIndicator(color: Colors.white)
-              : Text('إنشاء المنتج', style: AppTextStyles.button),
+          child:
+              controller
+                  .isLoading
+                  .value // Changed to controller.isLoading.value
+              ? const CircularProgressIndicator(
+                  color: Colors.white,
+                ) // Changed to controller.isLoading.value
+              : Text('createProductButton'.tr, style: AppTextStyles.button),
         ),
       );
     });
   }
 
-  void _showAddCategoryDialog() {
+  void _showAddCategoryDialog(ThemeData theme) {
     final categoryController = TextEditingController();
     Get.dialog(
       AlertDialog(
-        title: const Text('إضافة فئة'),
+        title: Text('addCategoryDialogTitle'.tr),
         content: TextField(
           controller: categoryController,
           decoration: InputDecoration(
-            hintText: 'أدخل معرف الفئة',
+            filled: true,
+            fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+            hintText: 'enterCategoryIdHint'.tr,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('إلغاء')),
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('cancelButton'.tr),
+          ),
           TextButton(
             onPressed: () {
               if (categoryController.text.isNotEmpty) {
@@ -240,27 +432,32 @@ class CreateProductView extends StatelessWidget {
                 Get.back();
               }
             },
-            child: const Text('إضافة'),
+            child: Text('addButton'.tr),
           ),
         ],
       ),
     );
   }
 
-  void _showAddPictureDialog() {
+  void _showAddPictureDialog(ThemeData theme) {
     final urlController = TextEditingController();
     Get.dialog(
       AlertDialog(
-        title: const Text('إضافة رابط صورة'),
+        title: Text('addImageUrlDialogTitle'.tr),
         content: TextField(
           controller: urlController,
           decoration: InputDecoration(
+            filled: true,
+            fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.3),
             hintText: 'https://example.com/image.jpg',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('إلغاء')),
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('cancelButton'.tr),
+          ),
           TextButton(
             onPressed: () {
               if (urlController.text.isNotEmpty) {
@@ -268,7 +465,7 @@ class CreateProductView extends StatelessWidget {
                 Get.back();
               }
             },
-            child: const Text('إضافة'),
+            child: Text('addButton'.tr),
           ),
         ],
       ),

@@ -11,11 +11,9 @@ class PromoCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       height: 150,
-      margin: EdgeInsets.zero, // إزالة الهامش ليتماشى مع حواف التطبيق
+      margin: EdgeInsets.zero,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceVariant.withOpacity(
-          0.5,
-        ), // يتفاعل مع الثيم
+        color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -41,7 +39,6 @@ class PromoCard extends StatelessWidget {
                 ),
               ),
             ),
-            // نصف دائرة في الشمال من الأسفل
             Positioned(
               bottom: -30,
               left: -50,

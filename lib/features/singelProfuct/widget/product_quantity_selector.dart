@@ -19,7 +19,11 @@ class ProductQuantitySelector extends StatelessWidget {
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),
-        Row(
+        Wrap(
+          alignment: WrapAlignment.start,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 8,
+          runSpacing: 8,
           children: [
             _buildQuantityButton(
               context,
@@ -27,8 +31,12 @@ class ProductQuantitySelector extends StatelessWidget {
               onPressed: () =>
                   context.read<ProductDetailsCubit>().decrementQuantity(),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Theme.of(context).colorScheme.surfaceVariant,
+              ),
               child: Text(
                 '$currentQuantity',
                 style: const TextStyle(
@@ -65,7 +73,8 @@ class ProductQuantitySelector extends StatelessWidget {
           HapticFeedback.lightImpact();
           onPressed();
         },
-        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+        constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+        padding: const EdgeInsets.all(8),
       ),
     );
   }

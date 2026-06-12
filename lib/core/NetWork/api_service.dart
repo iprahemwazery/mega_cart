@@ -67,7 +67,6 @@ class ApiService {
     }
   }
 
-  // New method for adding a product using Dio directly
   Future<void> addProduct(CreateProductRequest request) async {
     try {
       await dio.post(

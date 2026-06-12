@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:mega_cart/core/NetWork/api_service.dart';
 import 'package:mega_cart/core/NetWork/failure.dart';
 import 'package:mega_cart/core/models/product.dart';
-import 'package:mega_cart/features/home/view/home_repository.dart';
+import 'package:mega_cart/features/home/controller/home_repository.dart';
 
 class HomeRepositoryImpl implements HomeRepository {
   final ApiService _apiService;

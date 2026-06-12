@@ -7,10 +7,8 @@ class OrderCubit extends Cubit<OrderHistoryState> {
   void loadOrders() async {
     emit(const OrderHistoryState(status: OrderStatus.loading));
 
-    // محاكاة تأخير بسيط لجلب البيانات
     await Future.delayed(const Duration(milliseconds: 800));
 
-    // بيانات ثابتة للتصميم
     final dummyOrders = [
       OrderItem(
         id: '#MC-9582',

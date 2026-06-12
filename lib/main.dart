@@ -13,8 +13,8 @@ import 'package:mega_cart/features/favorites/cubit/favorites_cubit.dart';
 import 'package:mega_cart/features/auth/login/view/auth_repository_impl.dart';
 import 'package:mega_cart/core/NetWork/order_controller.dart';
 import 'package:mega_cart/features/home/cubit/category_cubit.dart';
-import 'package:mega_cart/features/home/view/home_repository_impl.dart';
-import 'package:mega_cart/features/order/view/order_cubit.dart';
+import 'package:mega_cart/features/home/controller/home_repository_impl.dart';
+import 'package:mega_cart/features/order/cubit/order_cubit.dart';
 import 'package:mega_cart/features/profile/cubit/profile_cubit.dart';
 import 'package:mega_cart/features/profile/data/profile_repository.dart';
 import 'package:mega_cart/features/profile/widget/user_repository.dart';
@@ -47,6 +47,7 @@ class MyApp extends StatelessWidget {
         headers: {'Accept': 'application/json'},
       ),
     );
+    Get.put(dio);
     final apiService = ApiService(dio);
     Get.put(apiService);
 
@@ -96,7 +97,7 @@ class MyApp extends StatelessWidget {
         builder: (context, child) {
           return GetMaterialApp(
             debugShowCheckedModeBanner: false,
-            title: 'Flutter Demo',
+            title: 'Mega Cart',
             theme: ThemeService.lightTheme,
             darkTheme: ThemeService.darkTheme,
             themeMode: ThemeService().theme,

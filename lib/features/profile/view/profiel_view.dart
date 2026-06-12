@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
-import 'package:mega_cart/core/NetWork/api_constans.dart';
-import 'package:mega_cart/core/customs/snackbar.dart';
-import 'package:mega_cart/features/order/view/page_animation_wrapper.dart';
-import 'package:mega_cart/features/profile/data/profile_conttroller.dart';
 import 'package:mega_cart/features/profile/cubit/profile_cubit.dart';
 import 'package:mega_cart/features/profile/cubit/profile_state.dart';
 import 'package:mega_cart/features/profile/widget/user_remote_data_source.dart';
 import 'package:mega_cart/features/profile/widget/user_repository_impl.dart';
-import 'package:mega_cart/features/settings/view/sttings_view.dart';
-import 'package:mega_cart/core/app_router.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:mega_cart/features/profile/widget/profile_header.dart';
+import 'package:mega_cart/features/profile/widget/profile_actions.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -23,12 +18,10 @@ class ProfileView extends StatelessWidget {
     // For demonstration, we'll use a hardcoded user ID.
     // In a real app, this would come from authentication.
     const String userId = 'user123';
-    // final controller = Get.put(HomeController());
 
     return BlocProvider(
       create: (context) {
-        final dio = Dio(BaseOptions(baseUrl: ApiConstans.baseUrl));
-        final remoteDataSource = UserRemoteDataSourceImpl(dio);
+        final remoteDataSource = UserRemoteDataSourceImpl(Get.find<Dio>());
         final userRepository = UserRepositoryImpl(remoteDataSource);
         return ProfileCubit(userRepository)..loadUserProfile(userId);
       },
@@ -41,16 +34,19 @@ class ProfileView extends StatelessWidget {
             } else if (state is ProfileLoaded) {
               final user = state.user;
               return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).padding.bottom + 90.h,
+                ),
                 child: Column(
                   children: [
-                    _buildProfileHeader(
-                      context,
-                      user.name,
-                      user.email,
-                      user.profilePictureUrl,
+                    ProfileHeader(
+                      userName: user.name,
+                      userEmail: user.email,
+                      profilePictureUrl: user.profilePictureUrl,
                     ),
                     const SizedBox(height: 20),
-                    _buildProfileActions(context),
+                    const ProfileActions(),
                   ],
                 ),
               );
@@ -84,236 +80,6 @@ class ProfileView extends StatelessWidget {
             return const SizedBox.shrink();
           },
         ),
-      ),
-    );
-  }
-
-  Widget _buildProfileHeader(
-    BuildContext context,
-    String userName,
-    String? userEmail,
-    String? profilePictureUrl,
-  ) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Theme.of(context).primaryColor,
-            Theme.of(context).primaryColor.withOpacity(0.8),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).primaryColor.withOpacity(0.4),
-            spreadRadius: 2,
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 3),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: CircleAvatar(
-              radius: 60,
-              backgroundColor: Colors.white,
-              child: ClipOval(
-                child: CachedNetworkImage(
-                  imageUrl: profilePictureUrl ?? '',
-                  width: 120,
-                  height: 120,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) =>
-                      const CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => Icon(
-                    Icons.person,
-                    size: 80,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 15),
-          Text(
-            userName,
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(color: Colors.white),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            userEmail ?? '',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyLarge?.copyWith(color: Colors.white70),
-          ),
-          const SizedBox(height: 18),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              icon: const Icon(Icons.add_business_outlined),
-              label: Text('addNewProduct'.tr),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Theme.of(context).primaryColor,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              onPressed: () => Get.toNamed(AppRoutes.createProduct),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfileActions(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: AnimationLimiter(
-        child: Column(
-          children: PageAnimationWrapper.staggeredList(
-            // عكس ترتيب العناصر لظهور الأنميشن من الأسفل للأعلى
-            children: [
-              _buildActionCard(
-                context,
-                icon: Icons.edit,
-                title: 'editProfile'.tr,
-                onTap: () {
-                  GlassSnackbar.show(message: 'editProfileMessage'.tr);
-                },
-              ),
-              _buildActionCard(
-                context,
-                icon: Icons.settings,
-                title: 'settings'.tr,
-                onTap: () {
-                  Get.bottomSheet(
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(25.0),
-                        ),
-                      ),
-                      child: const SttingsView(),
-                    ),
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                  );
-                },
-              ),
-              _buildActionCard(
-                context,
-                icon: Icons.add_circle_outline,
-                title: 'addNewProduct'.tr,
-                onTap: () => Get.toNamed(AppRoutes.createProduct),
-              ),
-              _buildActionCard(
-                context,
-                icon: Icons.notifications,
-                title: 'notifications'.tr,
-                onTap: () {
-                  GlassSnackbar.show(message: 'notificationsMessage'.tr);
-                },
-              ),
-              _buildActionCard(
-                context,
-                icon: Icons.help_outline,
-                title: 'helpAndSupport'.tr,
-                onTap: () {
-                  GlassSnackbar.show(message: 'helpSupportMessage'.tr);
-                },
-              ),
-              _buildActionCard(
-                context,
-                icon: Icons.logout,
-                title: 'logout'.tr,
-                isDestructive: true,
-                onTap: () {
-                  Get.defaultDialog(
-                    title: 'logout'.tr,
-                    middleText: 'logoutConfirmation'.tr,
-                    textConfirm: 'yes'.tr,
-                    textCancel: 'cancel'.tr,
-                    confirmTextColor: Colors.white,
-                    onConfirm: () {
-                      ProfileConttroller().logout();
-                      GlassSnackbar.show(message: 'logoutSuccessMessage'.tr);
-                    },
-                  );
-                },
-              ),
-              const SizedBox(height: 18),
-            ].reversed.toList(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionCard(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-    bool isDestructive = false,
-  }) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: Icon(
-          icon,
-          color: isDestructive
-              ? Theme.of(context).colorScheme.error
-              : Theme.of(
-                  context,
-                ).colorScheme.primary, // استخدام colorScheme.error
-        ),
-        title: Text(
-          title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            // استخدام TextTheme لتوحيد الخطوط
-            color: isDestructive
-                ? Theme.of(context).colorScheme.error
-                : Theme.of(
-                    context,
-                  ).colorScheme.onSurface, // استخدام لون يتفاعل مع الثيم
-          ),
-        ),
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          size: 18,
-          color: Colors.grey,
-        ),
-        onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       ),
     );
   }

@@ -119,7 +119,7 @@ class _SplashScreenViewState extends State<SplashScreenView>
                     colors: [
                       baseColor.withOpacity(0.05),
                       baseColor.withOpacity(0.2),
-                      baseColor, // مركز النور الساطع
+                      baseColor,
                       baseColor.withOpacity(0.2),
                       baseColor.withOpacity(0.05),
                     ],

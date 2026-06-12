@@ -23,9 +23,8 @@ class _HomeViewState extends State<HomeView>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<HomeCubit>().loadProducts();
-    });
+    // بدء تحميل البيانات فوراً عند بدء الشاشة
+    context.read<HomeCubit>().loadProducts();
   }
 
   @override
@@ -45,89 +44,82 @@ class _HomeViewState extends State<HomeView>
           );
         }
       },
-      child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 4),
-              BlocSelector<HomeCubit, HomeState, (String, bool, bool)>(
-                selector: (state) => (
-                  state.userEmail,
-                  state.showCategories,
-                  state.isSearchOverlayVisible,
-                ),
-                builder: (context, data) {
-                  final userEmail = data.$1;
-                  final showCategories = data.$2;
-                  final isSearchOverlayVisible = data.$3;
-                  final homeCubit = context.read<HomeCubit>();
-                  return HomeHeader(
-                    userEmail: userEmail,
-                    onHomePressed: () {
-                      homeCubit.toggleCategories(false);
-                      homeCubit.loadProducts();
-                    },
-                    onCategoryPressed: () {
-                      homeCubit.toggleCategories(true);
-                      context.read<CategoryCubit>().getCategories();
-                    },
-                    showCategories: showCategories,
-                    isSearching: isSearchOverlayVisible,
-                    onSearchModeChanged: (isSearching) {
-                      homeCubit.updateSearchOverlay(isSearching);
-                    },
-                    onSearchChanged: (value) {
-                      homeCubit.updateSearchTerm(value);
-                    },
-                    onSearchSubmitted: (value) {
-                      homeCubit.updateSearchTerm(value, immediate: true);
-                    },
-                  );
-                },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 4),
+            BlocSelector<HomeCubit, HomeState, (String, bool, bool)>(
+              selector: (state) => (
+                state.userEmail,
+                state.showCategories,
+                state.isSearchOverlayVisible,
               ),
-              Expanded(
-                child: Stack(
-                  alignment: Alignment.topCenter,
-                  children: [
-                    Positioned.fill(
-                      child: BlocSelector<HomeCubit, HomeState, bool>(
-                        selector: (state) => state.showCategories,
-                        builder: (context, showCategories) {
-                          if (showCategories) {
-                            return const CategoriesContent();
-                          } else {
-                            return const ProductsContent();
-                          }
-                        },
-                      ),
+              builder: (context, data) {
+                final userEmail = data.$1;
+                final showCategories = data.$2;
+                final isSearchOverlayVisible = data.$3;
+                final homeCubit = context.read<HomeCubit>();
+                return HomeHeader(
+                  userEmail: userEmail,
+                  onHomePressed: () {
+                    homeCubit.toggleCategories(false);
+                    homeCubit.loadProducts();
+                  },
+                  onCategoryPressed: () {
+                    homeCubit.toggleCategories(true);
+                    context.read<CategoryCubit>().getCategories();
+                  },
+                  showCategories: showCategories,
+                  isSearching: isSearchOverlayVisible,
+                  onSearchModeChanged: (isSearching) {
+                    homeCubit.updateSearchOverlay(isSearching);
+                  },
+                  onSearchChanged: (value) {
+                    homeCubit.updateSearchTerm(value);
+                  },
+                  onSearchSubmitted: (value) {
+                    homeCubit.updateSearchTerm(value, immediate: true);
+                  },
+                );
+              },
+            ),
+            Expanded(
+              child: Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  Positioned.fill(
+                    child: BlocSelector<HomeCubit, HomeState, bool>(
+                      selector: (state) => state.showCategories,
+                      builder: (context, showCategories) {
+                        if (showCategories) {
+                          return const CategoriesContent();
+                        } else {
+                          return const ProductsContent();
+                        }
+                      },
                     ),
-                    Positioned.fill(
-                      child: BlocSelector<HomeCubit, HomeState, bool>(
-                        selector: (state) => state.isSearchOverlayVisible,
-                        builder: (context, isSearchOverlayVisible) {
-                          if (isSearchOverlayVisible) {
-                            return BlocSelector<
-                              HomeCubit,
-                              HomeState,
-                              HomeState
-                            >(
-                              selector: (state) => state,
-                              builder: (context, searchState) {
-                                return SearchResultsOverlay(state: searchState);
-                              },
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
+                  ),
+                  Positioned.fill(
+                    child: BlocSelector<HomeCubit, HomeState, bool>(
+                      selector: (state) => state.isSearchOverlayVisible,
+                      builder: (context, isSearchOverlayVisible) {
+                        if (isSearchOverlayVisible) {
+                          return BlocSelector<HomeCubit, HomeState, HomeState>(
+                            selector: (state) => state,
+                            builder: (context, searchState) {
+                              return SearchResultsOverlay(state: searchState);
+                            },
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

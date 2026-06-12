@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mega_cart/features/cart/cubit/cart_cubit.dart';
 import 'package:mega_cart/features/cart/cubit/cart_state.dart';
-import 'package:mega_cart/features/settings/view/cart_item_card.dart';
-import 'package:mega_cart/features/order/view/page_animation_wrapper.dart';
+import 'package:mega_cart/features/settings/widget/cart_item_card.dart';
+import 'package:mega_cart/features/order/widget/page_animation_wrapper.dart';
 
 class CartItemList extends StatelessWidget {
   const CartItemList({super.key});

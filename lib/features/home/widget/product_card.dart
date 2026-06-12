@@ -68,7 +68,7 @@ class ProductCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       // Price
                       Row(
                         children: [
@@ -84,7 +84,7 @@ class ProductCard extends StatelessWidget {
                             ),
                           ),
                           if (product.discountPercentage > 0) ...[
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 12),
                             Flexible(
                               child: Text(
                                 '\$${(product.price / (1 - product.discountPercentage / 100)).toStringAsFixed(2)}',

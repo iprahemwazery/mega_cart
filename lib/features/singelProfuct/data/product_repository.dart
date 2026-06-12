@@ -19,6 +19,19 @@ class ProductRepositoryImpl implements ProductRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, void>> createProduct(
+    CreateProductRequest request, {
+    String? token,
+  }) async {
+    try {
+      await apiService.addProduct(request);
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
   // Implementation of the new addProduct method
   @override
   Future<Either<Failure, dynamic>> addProduct({

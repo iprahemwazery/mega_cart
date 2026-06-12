@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:mega_cart/features/home/cubit/home_state.dart';
 import 'package:mega_cart/core/models/product.dart';
-import 'package:mega_cart/features/home/view/home_repository.dart';
+import 'package:mega_cart/features/home/controller/home_repository.dart';
 import 'package:mega_cart/features/splashScreen/view/session_manager.dart';
 import 'package:flutter/foundation.dart';
 

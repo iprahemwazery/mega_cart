@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:get/get.dart'; // يمكن استخدامها للتنقل أو إظهار الـ snackbar
+import 'package:get/get.dart';
 import 'package:mega_cart/features/home/widget/promo_card.dart';
 
 class HomeHeader extends StatefulWidget {
   final String userEmail;
-  final String? userImageUrl; // متغير جديد لرابط الصورة
+  final String? userImageUrl;
 
   // Callbacks for button presses
   final VoidCallback onHomePressed;
   final VoidCallback onCategoryPressed;
-  final bool showCategories; // To highlight the active button
-  final Function(String)? onSearchChanged; // Callback للبحث
-  final Function(String)?
-  onSearchSubmitted; // Callback عند الضغط على زر البحث في الكيبورد
-  final Function(bool)? onSearchModeChanged; // إخبار الأب بحالة البحث
-  final bool isSearching; // بارامتر جديد للتحكم من الخارج
+  final bool showCategories;
+  final Function(String)? onSearchChanged;
+  final Function(String)? onSearchSubmitted;
+  final Function(bool)? onSearchModeChanged;
+  final bool isSearching;
   const HomeHeader({
     super.key,
     required this.userEmail,
@@ -50,7 +49,6 @@ class _HomeHeaderState extends State<HomeHeader> {
   @override
   void didUpdateWidget(covariant HomeHeader oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // إذا تم إغلاق البحث من الخارج، قم بمسح نص البحث
     if (oldWidget.isSearching && !widget.isSearching) {
       _searchController.clear();
     }
@@ -250,7 +248,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                           ? colorScheme.onPrimary
                           : colorScheme.onSurfaceVariant,
                     ),
-                    child: Text('account'.tr),
+                    child: Text('Categories'.tr),
                   ),
                   const Spacer(),
                 ],

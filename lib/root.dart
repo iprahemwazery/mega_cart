@@ -6,6 +6,7 @@ import 'package:mega_cart/features/cart/view/cart_view.dart';
 import 'package:mega_cart/features/order/view/orde_view.dart';
 import 'package:mega_cart/features/profile/view/profiel_view.dart';
 import 'package:mega_cart/core/customs/navigation/floating_capsule_nav_bar.dart';
+import 'package:mega_cart/core/animations/page_animation_wrapper.dart';
 
 class Root extends StatefulWidget {
   const Root({super.key});
@@ -55,31 +56,28 @@ class _RootState extends State<Root> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true, // للسماح للبار بالطفو فوق المحتوى
+      extendBody: true,
       body: NotificationListener<ScrollNotification>(
         onNotification: (notification) {
           if (notification is ScrollUpdateNotification) {
-            // حساب سرعة التمرير بناءً على المسافة المقطوعة في الإطار الحالي
             final velocity = notification.scrollDelta?.abs() ?? 0;
-            // زيادة التضبيب تدريجياً مع السرعة (بحد أقصى 30)
             _blurSigma.value = (12.0 + (velocity * 0.5)).clamp(12.0, 30.0);
           } else if (notification is ScrollEndNotification) {
-            // العودة للقيمة الأصلية عند توقف التمرير
             _blurSigma.value = 12.0;
           }
           return false;
         },
-        child: IndexedStack(
-          index: _currentIndex,
-          children: List.generate(_navItems.length, (index) {
-            // إعطاء Key فريد للصفحة النشطة لإجبار الأنميشن على البدء من جديد
-            return KeyedSubtree(
-              key: ValueKey(
-                _currentIndex == index ? 'active_$index' : 'inactive_$index',
-              ),
-              child: _navItems[index].screen,
-            );
-          }),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          child: PageAnimationWrapper(
+            key: ValueKey(_currentIndex),
+            index: 0,
+            verticalOffset: _currentIndex == 3 ? 50.0 : -50.0,
+            child: _navItems[_currentIndex].screen,
+          ),
         ),
       ),
       bottomNavigationBar: FloatingCapsuleNavBar(

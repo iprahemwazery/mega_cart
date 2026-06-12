@@ -59,20 +59,22 @@ class _CheckoutBottomSheetContent extends StatelessWidget {
           color: theme.scaffoldBackgroundColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const HandleBar(),
-            const SizedBox(height: 24),
-            const CheckoutHeader(),
-            const Divider(height: 24),
-            const CheckoutForm(),
-            const SizedBox(height: 24),
-            const CheckoutSummary(),
-            const SizedBox(height: 32),
-            const CheckoutActionButton(),
-            const SizedBox(height: 20),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const HandleBar(),
+              const SizedBox(height: 24),
+              const CheckoutHeader(),
+              const Divider(height: 24),
+              const CheckoutForm(),
+              const SizedBox(height: 24),
+              const CheckoutSummary(),
+              const SizedBox(height: 32),
+              const CheckoutActionButton(),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );

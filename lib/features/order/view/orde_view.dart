@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:mega_cart/features/order/view/order_card_widget.dart';
-import 'package:mega_cart/features/order/view/order_cubit.dart';
-import 'package:mega_cart/features/order/view/order_state.dart';
-import 'package:mega_cart/features/order/view/page_animation_wrapper.dart';
+import 'package:mega_cart/features/order/widget/order_card_widget.dart';
+import 'package:mega_cart/features/order/cubit/order_cubit.dart';
+import 'package:mega_cart/features/order/cubit/order_state.dart';
+import 'package:mega_cart/features/order/widget/page_animation_wrapper.dart';
 
 class OrderView extends StatelessWidget {
   const OrderView({super.key});
@@ -29,6 +29,28 @@ class OrderView extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
+          if (state.status == OrderStatus.failure) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.wifi_off_rounded,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(state.errorMessage ?? 'fetchError'.tr),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () => context.read<OrderCubit>().loadOrders(),
+                    child: Text('retry'.tr),
+                  ),
+                ],
+              ),
+            );
+          }
+
           if (state.orders.isEmpty) {
             return Center(
               child: Column(
@@ -44,6 +66,7 @@ class OrderView extends StatelessWidget {
                     'noOrders'.tr,
                     style: const TextStyle(color: Colors.grey, fontSize: 16),
                   ),
+                  const SizedBox(height: 54),
                 ],
               ),
             );
@@ -53,7 +76,12 @@ class OrderView extends StatelessWidget {
             onRefresh: () async => context.read<OrderCubit>().loadOrders(),
             child: AnimationLimiter(
               child: ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  top: 16,
+                  bottom: 100,
+                ),
                 itemCount: state.orders.length,
                 itemBuilder: (context, index) {
                   final order = state.orders[index];

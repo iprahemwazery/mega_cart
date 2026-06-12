@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mega_cart/features/favorites/cubit/favorites_cubit.dart';
 import 'package:mega_cart/features/favorites/cubit/favorites_state.dart';
 import 'package:mega_cart/features/home/widget/product_card.dart';
-import 'package:mega_cart/features/order/view/page_animation_wrapper.dart';
+import 'package:mega_cart/core/animations/page_animation_wrapper.dart';
 import 'package:get/get.dart';
 
 class FavoritView extends StatefulWidget {
@@ -47,7 +48,13 @@ class _FavoritViewState extends State<FavoritView>
           }
 
           return GridView.builder(
-            padding: const EdgeInsets.all(16),
+            physics: const BouncingScrollPhysics(),
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 16,
+              bottom: 84.h,
+            ),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               childAspectRatio: 0.75,
@@ -59,7 +66,7 @@ class _FavoritViewState extends State<FavoritView>
               final product = state.favorites[index];
               return PageAnimationWrapper(
                 index: index,
-                delay: Duration(milliseconds: 50 * index),
+                verticalOffset: 50.0,
                 child: ProductCard(product: product),
               );
             },

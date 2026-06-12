@@ -1,10 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class GlassSnackbar {
   static void show({required String message, bool isError = false}) {
+    HapticFeedback.lightImpact();
     Get.rawSnackbar(
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.transparent,

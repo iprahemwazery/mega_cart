@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:mega_cart/features/favorites/cubit/favorites_cubit.dart';
 import 'package:mega_cart/features/favorites/cubit/favorites_state.dart';
+import 'package:mega_cart/core/customs/snackbar.dart';
 import 'package:mega_cart/features/singelProfuct/cubit/product_details_cubit.dart';
 import 'package:mega_cart/features/singelProfuct/cubit/product_details_state.dart';
 import 'package:mega_cart/core/app_router.dart';
 import 'package:mega_cart/core/customs/shimmer_loading.dart';
-import 'package:mega_cart/features/order/view/page_animation_wrapper.dart';
+import 'package:mega_cart/features/order/widget/page_animation_wrapper.dart';
 import '../widget/product_description_section.dart';
-import '../widget/product_image_section.dart';
 import '../widget/product_info_section.dart';
 import '../widget/product_quantity_selector.dart';
 import '../widget/product_details_bottom_bar.dart';
+import 'package:mega_cart/core/models/product.dart';
 
 class ProductDetailsView extends StatelessWidget {
   const ProductDetailsView({super.key});
@@ -29,7 +31,7 @@ class ProductDetailsView extends StatelessWidget {
         return Scaffold(
           body: Stack(
             children: [
-              _buildBody(context, state),
+              _buildBody(context, state, productId),
               Positioned(
                 top: 45,
                 left: 15,
@@ -89,7 +91,11 @@ class ProductDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildBody(BuildContext context, ProductDetailsState state) {
+  Widget _buildBody(
+    BuildContext context,
+    ProductDetailsState state,
+    String productId,
+  ) {
     if (state is ProductDetailsLoading) {
       return const ProductDetailsSkeleton();
     } else if (state is ProductDetailsSuccess) {
@@ -103,7 +109,7 @@ class ProductDetailsView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: PageAnimationWrapper.staggeredList(
               children: [
-                ProductImageSection(product: product),
+                ProductImageSlider(product: product),
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
@@ -125,7 +131,20 @@ class ProductDetailsView extends StatelessWidget {
       );
     } else if (state is ProductDetailsError) {
       return Center(
-        child: Text('error'.trParams({'errorMessage': state.message})),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.wifi_off_rounded, size: 64, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text('error'.trParams({'errorMessage': state.message})),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () =>
+                  context.read<ProductDetailsCubit>().loadProduct(productId),
+              child: Text('retry'.tr),
+            ),
+          ],
+        ),
       );
     }
     return const SizedBox.shrink();
@@ -152,11 +171,12 @@ class ProductDetailsView extends StatelessWidget {
 
   void _confirmDelete(BuildContext context, String productId) {
     Get.defaultDialog(
-      title: 'deleteProductTitle'.tr,
-      middleText: 'deleteProductConfirmation'.tr,
-      textCancel: 'cancelButton'.tr,
-      textConfirm: 'deleteButton'.tr,
-      confirmTextColor: Colors.white,
+      title: 'delete Product'.tr,
+      middleText: 'This action cannot be undone'.tr,
+      textCancel: 'cancel'.tr,
+      textConfirm: 'delete'.tr,
+      confirmTextColor: Colors.red,
+      buttonColor: Colors.white,
       onConfirm: () async {
         Get.back();
         final result = await context.read<ProductDetailsCubit>().deleteProduct(
@@ -164,26 +184,108 @@ class ProductDetailsView extends StatelessWidget {
         );
         result.fold(
           (failure) {
-            Get.snackbar(
-              'errorTitle'.tr,
-              failure.message,
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: Colors.red,
-              colorText: Colors.white,
-            );
+            GlassSnackbar.show(message: failure.message, isError: true);
           },
           (_) {
             Get.offAllNamed(AppRoutes.root);
-            Get.snackbar(
-              'successTitle'.tr,
-              'productDeletedSuccess'.tr,
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: Colors.green,
-              colorText: Colors.white,
-            );
+            GlassSnackbar.show(message: 'productDeletedSuccess'.tr);
           },
         );
       },
+    );
+  }
+}
+
+class ProductImageSlider extends StatefulWidget {
+  final Product product;
+  const ProductImageSlider({super.key, required this.product});
+
+  @override
+  State<ProductImageSlider> createState() => _ProductImageSliderState();
+}
+
+class _ProductImageSliderState extends State<ProductImageSlider> {
+  final PageController _pageController = PageController();
+  int _currentIndex = 0;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String> images = [
+      widget.product.coverPictureUrl,
+      ...widget.product.productPictures,
+    ].where((url) => url.isNotEmpty).toList();
+
+    if (images.isEmpty) {
+      return const SizedBox(
+        height: 350,
+        child: Center(child: Icon(Icons.image_not_supported, size: 50)),
+      );
+    }
+
+    return SizedBox(
+      height: 350,
+      child: Stack(
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            itemCount: images.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return CachedNetworkImage(
+                imageUrl: images[index],
+                fit: BoxFit.cover,
+                memCacheHeight: 800,
+                maxWidthDiskCache: 1000,
+                width: double.infinity,
+                placeholder: (context, url) => Center(
+                  child: ShimmerLoading(
+                    child: Container(
+                      width: double.infinity,
+                      height: 350,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+              );
+            },
+          ),
+          if (images.length > 1)
+            Positioned(
+              bottom: 20,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  images.length,
+                  (index) => AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: _currentIndex == index ? 20 : 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      color: _currentIndex == index
+                          ? Theme.of(context).primaryColor
+                          : Colors.white.withOpacity(0.5),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

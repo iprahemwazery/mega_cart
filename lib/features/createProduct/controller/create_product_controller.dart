@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mega_cart/core/customs/snackbar.dart';
 import 'package:mega_cart/core/models/create_product_request.dart';
 import 'package:mega_cart/core/services/product_service.dart';
 import 'package:mega_cart/features/splashScreen/view/session_manager.dart';
@@ -43,6 +44,7 @@ class CreateProductController extends GetxController {
   void onInit() {
     super.onInit();
     _loadToken();
+    sellerIdController.text = 'd051dbf3-f5d8-410d-0e50-08de06562562';
   }
 
   void _loadToken() async {
@@ -88,22 +90,12 @@ class CreateProductController extends GetxController {
 
       await productService.createProduct(request);
 
-      Get.snackbar(
-        'successTitle'.tr,
-        'productCreatedSuccessMessage'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-
-      _clearForm();
+      Get.back(result: true);
+      GlassSnackbar.show(message: 'productCreatedSuccessMessage'.tr);
     } catch (e) {
-      Get.snackbar(
-        'errorTitle'.tr,
-        'errorOccurredMessage'.trParams({'error': e.toString()}),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+      GlassSnackbar.show(
+        message: 'errorOccurredMessage'.trParams({'error': e.toString()}),
+        isError: true,
       );
     } finally {
       isLoading.value = false;
@@ -146,13 +138,7 @@ class CreateProductController extends GetxController {
   }
 
   void _showError(String message) {
-    Get.snackbar(
-      'dataValidationTitle'.tr,
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.orange,
-      colorText: Colors.white,
-    );
+    GlassSnackbar.show(message: message, isError: true);
   }
 
   void _clearForm() {
@@ -191,7 +177,6 @@ class CreateProductController extends GetxController {
     productPictureUrls.remove(url);
   }
 
-  /// ملء الحقول ببيانات اختبارية (مثل البيانات المرسلة من Postman)
   void fillWithSampleData() {
     sellerIdController.text = 'd051dbf3-f5d8-410d-0e50-08de06562562';
     nameController.text = 'Aviator Sunglasses';
@@ -211,7 +196,6 @@ class CreateProductController extends GetxController {
     productPictureUrls.clear();
   }
 
-  /// ملء الحقول بالبيانات ثم الإرسال فوراً
   Future<void> fillAndSubmitSample() async {
     fillWithSampleData();
     await createProduct();

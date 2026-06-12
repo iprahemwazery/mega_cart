@@ -49,12 +49,6 @@ class PageAnimationWrapper extends StatelessWidget {
   final Duration duration;
   final Duration? delay;
   final double verticalOffset;
-
-  /// [index]: موضع العنصر في القائمة (مهم لحساب التأخير المتدرج)
-  /// [child]: الـ Widget المراد تطبيق الأنميشن عليه
-  /// [duration]: مدة الأنميشن (الافتراضية 800ms)
-  /// [delay]: التأخير المخصص (إذا لم يتم تحديده، سيتم حسابه من index)
-  /// [verticalOffset]: المسافة التي ينزلق منها العنصر (الافتراضية 60)
   const PageAnimationWrapper({
     super.key,
     required this.index,
@@ -64,16 +58,6 @@ class PageAnimationWrapper extends StatelessWidget {
     this.verticalOffset = 60.0,
   });
 
-  /// لتطبيق الأنميشن على قائمة كاملة من العناصر
-  ///
-  /// **المثال:**
-  /// ```dart
-  /// Column(
-  ///   children: PageAnimationWrapper.staggeredList(
-  ///     children: myWidgets,
-  ///   ),
-  /// )
-  /// ```
   static List<Widget> staggeredList({
     required List<Widget> children,
     Duration duration = const Duration(milliseconds: 800),

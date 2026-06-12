@@ -95,7 +95,7 @@ class FloatingCapsuleNavBar extends StatelessWidget {
             return BackdropFilter(
               filter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
                 decoration: BoxDecoration(
                   color: theme.cardColor.withOpacity(
                     (sigma / 40).clamp(0.4, 0.8),
@@ -154,7 +154,7 @@ class FloatingCapsuleNavBar extends StatelessWidget {
             Icon(
               isSelected ? (activeIcon ?? icon) : icon,
               color: isSelected ? theme.colorScheme.primary : theme.hintColor,
-              size: 20,
+              size: 22.sp,
             ),
             AnimatedSize(
               duration: const Duration(milliseconds: 300),

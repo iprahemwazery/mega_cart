@@ -7,7 +7,7 @@ import 'package:mega_cart/core/models/product.dart';
 import 'package:mega_cart/features/home/cubit/home_cubit.dart';
 import 'package:mega_cart/features/home/cubit/home_state.dart';
 import 'package:mega_cart/features/home/widget/product_card.dart';
-import 'package:mega_cart/features/order/view/page_animation_wrapper.dart';
+import 'package:mega_cart/features/order/widget/page_animation_wrapper.dart';
 
 class ProductsContent extends StatelessWidget {
   const ProductsContent({super.key});
@@ -41,7 +41,7 @@ class ProductsContent extends StatelessWidget {
         if (status == HomeStatus.loading && products.isEmpty) {
           return GridView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.only(top: 16, bottom: 80),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               childAspectRatio: 0.75,
@@ -50,6 +50,28 @@ class ProductsContent extends StatelessWidget {
             ),
             itemCount: 6,
             itemBuilder: (context, index) => const ProductCardSkeleton(),
+          );
+        }
+
+        if (status == HomeStatus.failure && products.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.wifi_off_rounded,
+                  size: 64,
+                  color: Colors.grey,
+                ),
+                const SizedBox(height: 16),
+                Text('fetchError'.tr, style: theme.textTheme.bodyMedium),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () => context.read<HomeCubit>().loadProducts(),
+                  child: Text('retry'.tr),
+                ),
+              ],
+            ),
           );
         }
 
@@ -73,7 +95,7 @@ class ProductsContent extends StatelessWidget {
                     context.read<HomeCubit>().loadProducts(isRefresh: true),
                 child: GridView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.only(bottom: 80),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     childAspectRatio: 0.75,

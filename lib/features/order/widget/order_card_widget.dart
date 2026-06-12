@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mega_cart/features/order/view/order_state.dart';
+import 'package:mega_cart/features/order/cubit/order_state.dart';
 
 class OrderCardWidget extends StatelessWidget {
   final OrderItem order;

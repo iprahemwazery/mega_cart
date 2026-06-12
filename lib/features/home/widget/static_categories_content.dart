@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mega_cart/core/models/category.dart';
 
 class StaticCategoriesContent extends StatelessWidget {
@@ -6,13 +7,9 @@ class StaticCategoriesContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // هذا الـ Widget أصبح الآن مجرد مكان لتحديد شكل الكارد الواحد
-    // عملية بناء القائمة ستتم في _buildCategoriesContent في HomeView
-    // لذلك، يمكن أن يعود بـ SizedBox.shrink() أو يتم إزالته إذا لم يكن له استخدام آخر
     return const SizedBox.shrink();
   }
 
-  // تصميم كارت القسم التبادلي الاحترافي
   static Widget buildCategoryCard(Category category, int index) {
     bool isEven = index % 2 == 0;
     return Container(
@@ -23,11 +20,15 @@ class StaticCategoriesContent extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: Stack(
           children: [
-            // الصورة تأخذ كامل مساحة الكارت كخلفية
             Positioned.fill(
-              child: Image.network(category.coverPictureUrl, fit: BoxFit.cover),
+              child: CachedNetworkImage(
+                imageUrl: category.coverPictureUrl,
+                fit: BoxFit.cover,
+                placeholder: (context, url) =>
+                    Container(color: Colors.grey[300]),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+              ),
             ),
-            // طبقة تدرج لوني غامقة من الأسفل لضمان وضوح النص الأبيض
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
@@ -39,7 +40,6 @@ class StaticCategoriesContent extends StatelessWidget {
                 ),
               ),
             ),
-            // النصوص فوق الصورة في الركن السفلي
             Align(
               alignment: isEven ? Alignment.bottomRight : Alignment.bottomLeft,
               child: Padding(

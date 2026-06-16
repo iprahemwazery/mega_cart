@@ -1,14 +1,13 @@
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' hide Transition;
 import 'package:mega_cart/core/NetWork/api_service.dart';
+import 'package:mega_cart/features/home/presentation/view/home_view.dart';
 import 'package:mega_cart/features/singelProfuct/cubit/product_details_cubit.dart';
 import 'package:mega_cart/features/singelProfuct/data/product_repository.dart';
 import 'package:mega_cart/features/auth/login/view/login_view.dart';
 import 'package:mega_cart/features/auth/signup/view/signup_view.dart';
 import 'package:mega_cart/features/auth/verify_email/view/verify_email_view.dart';
-import 'package:mega_cart/features/createProduct/view/create_product_view.dart';
-import 'package:mega_cart/features/home/view/home_view.dart';
+import 'package:mega_cart/features/addProduct/presentation/view/create_product_view.dart';
 import 'package:mega_cart/features/settings/view/sttings_view.dart';
 import 'package:mega_cart/features/splashScreen/view/splash_screen_view.dart';
 import 'package:mega_cart/root.dart';

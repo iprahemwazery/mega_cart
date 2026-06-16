@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
-import 'package:mega_cart/core/models/product.dart';
+import 'package:mega_cart/features/home/data/models/product.dart';
 import 'package:mega_cart/core/models/create_product_request.dart';
 import 'package:mega_cart/core/NetWork/error_interceptor.dart';
 

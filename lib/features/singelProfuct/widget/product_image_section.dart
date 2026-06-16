@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mega_cart/core/customs/shimmer_loading.dart';
-import 'package:mega_cart/core/models/product.dart';
+import 'package:mega_cart/features/home/data/models/product.dart';
 
 class ProductImageSection extends StatelessWidget {
   final Product product;

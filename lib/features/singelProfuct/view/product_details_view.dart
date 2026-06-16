@@ -14,7 +14,7 @@ import '../widget/product_description_section.dart';
 import '../widget/product_info_section.dart';
 import '../widget/product_quantity_selector.dart';
 import '../widget/product_details_bottom_bar.dart';
-import 'package:mega_cart/core/models/product.dart';
+import 'package:mega_cart/features/home/data/models/product.dart';
 
 class ProductDetailsView extends StatelessWidget {
   const ProductDetailsView({super.key});

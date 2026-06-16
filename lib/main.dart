@@ -12,19 +12,25 @@ import 'package:mega_cart/features/CheckOut/cubit/checkout_cubit.dart';
 import 'package:mega_cart/features/favorites/cubit/favorites_cubit.dart';
 import 'package:mega_cart/features/auth/login/view/auth_repository_impl.dart';
 import 'package:mega_cart/core/NetWork/order_controller.dart';
-import 'package:mega_cart/features/home/cubit/category_cubit.dart';
-import 'package:mega_cart/features/home/controller/home_repository_impl.dart';
+import 'package:mega_cart/features/home/data/home_repository_impl.dart';
+import 'package:mega_cart/features/home/domain/get_products_use_case.dart';
+import 'package:mega_cart/features/home/presentation/cubit/category/category_cubit.dart';
 import 'package:mega_cart/features/order/cubit/order_cubit.dart';
 import 'package:mega_cart/features/profile/cubit/profile_cubit.dart';
-import 'package:mega_cart/features/profile/data/profile_repository.dart';
-import 'package:mega_cart/features/profile/widget/user_repository.dart';
+import 'package:mega_cart/features/profile/widget/user_remote_data_source.dart';
+import 'package:mega_cart/features/profile/widget/user_repository_impl.dart';
+import 'package:mega_cart/core/NetWork/product_repository.dart'
+    as core_product_repo; // Alias to avoid conflict
 import 'package:mega_cart/features/singelProfuct/data/product_repository.dart';
 import 'package:mega_cart/core/NetWork/api_service.dart';
-import 'package:mega_cart/features/home/cubit/home_cubit.dart';
-import 'package:mega_cart/features/cart/cubit/cart_cubit.dart';
+import 'package:mega_cart/features/home/presentation/cubit/home/home_cubit.dart';
+import 'package:mega_cart/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:mega_cart/features/auth/login/cubit/login_cubit.dart';
+import 'package:mega_cart/features/cart/domain/user_case/add_to_cart_use_case.dart';
+import 'package:mega_cart/features/cart/domain/user_case/delete_cart_item_use_case.dart';
+import 'package:mega_cart/features/cart/domain/user_case/get_cart_use_case.dart';
 import 'package:mega_cart/features/auth/signup/cubit/signup_cubit.dart';
-import 'package:mega_cart/features/cart/data/cart_repository_impl.dart';
+import 'package:mega_cart/features/cart/data/repositries/cart_repository_impl.dart';
 import 'package:mega_cart/core/l10n/app_translations.dart';
 import 'package:mega_cart/core/l10n/app_localizations.dart';
 
@@ -60,16 +66,24 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => SignupCubit(AuthRepositoryImpl(dio))),
         //home
         BlocProvider(
-          create: (context) =>
-              HomeCubit(HomeRepositoryImpl(apiService))..loadProducts(),
+          create: (context) => HomeCubit(
+            Get.put(GetProductsUseCase(HomeRepositoryImpl(apiService))),
+          ),
         ),
         //category
         BlocProvider(create: (context) => CategoryCubit()..getCategories()),
         //cart
         BlocProvider(
           create: (context) => CartCubit(
+            Get.put(
+              GetCartUseCase(
+                CartRepositoryImpl(dio),
+                ProductRepositoryImpl(apiService),
+              ),
+            ),
+            Get.put(DeleteCartItemUseCase(CartRepositoryImpl(dio))),
+            Get.put(AddToCartUseCase(CartRepositoryImpl(dio))),
             CartRepositoryImpl(dio),
-            ProductRepositoryImpl(apiService),
           ),
         ),
 
@@ -79,7 +93,7 @@ class MyApp extends StatelessWidget {
         //profile
         BlocProvider(
           create: (context) =>
-              ProfileCubit(ProfileRepositoryImpl() as UserRepository),
+              ProfileCubit(UserRepositoryImpl(UserRemoteDataSourceImpl(dio))),
         ),
 
         //checkout

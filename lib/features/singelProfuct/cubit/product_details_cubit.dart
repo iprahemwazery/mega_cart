@@ -3,7 +3,7 @@ import 'package:dartz/dartz.dart';
 import 'package:mega_cart/core/NetWork/product_repository.dart';
 import 'package:mega_cart/features/singelProfuct/cubit/product_details_state.dart';
 import 'package:mega_cart/core/NetWork/failure.dart';
-import 'package:mega_cart/core/models/product.dart';
+import 'package:mega_cart/features/home/data/models/product.dart';
 
 class ProductDetailsCubit extends Cubit<ProductDetailsState> {
   final ProductRepository repository;

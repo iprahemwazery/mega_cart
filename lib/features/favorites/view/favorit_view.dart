@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mega_cart/features/favorites/cubit/favorites_cubit.dart';
 import 'package:mega_cart/features/favorites/cubit/favorites_state.dart';
-import 'package:mega_cart/features/home/widget/product_card.dart';
 import 'package:mega_cart/core/animations/page_animation_wrapper.dart';
 import 'package:get/get.dart';
+import 'package:mega_cart/features/home/presentation/widget/product_card.dart';
 
 class FavoritView extends StatefulWidget {
   const FavoritView({super.key});

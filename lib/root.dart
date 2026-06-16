@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mega_cart/features/home/view/home_view.dart';
 import 'package:mega_cart/features/favorites/view/favorit_view.dart';
 import 'package:get/get.dart';
-import 'package:mega_cart/features/cart/view/cart_view.dart';
+import 'package:mega_cart/features/cart/presentation/view/cart_view.dart';
+import 'package:mega_cart/features/home/presentation/view/home_view.dart';
 import 'package:mega_cart/features/order/view/orde_view.dart';
 import 'package:mega_cart/features/profile/view/profiel_view.dart';
 import 'package:mega_cart/core/customs/navigation/floating_capsule_nav_bar.dart';

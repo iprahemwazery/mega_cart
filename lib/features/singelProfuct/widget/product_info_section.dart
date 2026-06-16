@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mega_cart/core/models/product.dart';
+import 'package:mega_cart/features/home/data/models/product.dart';
 
 class ProductInfoSection extends StatelessWidget {
   final Product product;

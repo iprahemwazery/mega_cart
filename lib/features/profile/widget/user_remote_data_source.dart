@@ -1,8 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
-import 'package:mega_cart/features/home/controller/home_controller.dart';
+import 'package:mega_cart/features/splashScreen/view/session_manager.dart';
 import 'package:mega_cart/core/models/user_model.dart';
 
 abstract class UserRemoteDataSource {
@@ -11,7 +9,6 @@ abstract class UserRemoteDataSource {
 
 class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   final Dio dio;
-  final controller = Get.put(HomeController());
 
   UserRemoteDataSourceImpl(this.dio);
 
@@ -22,15 +19,14 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
 
     // Mock data for demonstration
     if (userId == 'user123') {
+      final email =
+          await SessionManager.getUserEmail() ?? 'mohamed.ahmed@example.com';
+      final name = email.split('@')[0];
+
       return UserModel.fromJson({
         'id': 'user123',
-        'name': controller.userName.value.isNotEmpty
-            ? controller.userName.value
-            : 'Mohamed Ahmed',
-        'email': controller.userEmail.value.isNotEmpty
-            ? controller.userEmail.value
-            : 'mohamed.ahmed@example.com',
-
+        'name': name,
+        'email': email,
         'profilePictureUrl':
             'https://via.placeholder.com/150/0000FF/FFFFFF?text=MA', // Example image
       });

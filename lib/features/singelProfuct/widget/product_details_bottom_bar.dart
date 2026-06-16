@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
-import 'package:mega_cart/core/models/product.dart';
-import 'package:mega_cart/features/cart/cubit/cart_cubit.dart';
-import 'package:mega_cart/features/cart/cubit/cart_state.dart';
+import 'package:mega_cart/features/home/data/models/product.dart';
+import 'package:mega_cart/features/cart/presentation/cubit/cart_cubit.dart';
+import 'package:mega_cart/features/cart/presentation/cubit/cart_state.dart';
 
 class ProductDetailsBottomBar extends StatelessWidget {
   final Product product;

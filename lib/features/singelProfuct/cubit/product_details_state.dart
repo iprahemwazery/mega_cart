@@ -1,4 +1,4 @@
-import 'package:mega_cart/core/models/product.dart';
+import 'package:mega_cart/features/home/data/models/product.dart';
 
 abstract class ProductDetailsState {}
 

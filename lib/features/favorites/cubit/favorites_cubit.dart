@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mega_cart/core/models/product.dart';
+import 'package:mega_cart/features/home/data/models/product.dart';
 import 'package:mega_cart/core/customs/snackbar.dart';
 import 'package:mega_cart/features/favorites/cubit/favorites_state.dart';
 

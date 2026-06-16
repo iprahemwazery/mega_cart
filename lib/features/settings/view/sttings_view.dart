@@ -95,6 +95,7 @@ class _SettingsSectionTitle extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _AppearanceSection extends StatelessWidget {
   final SettingsController controller;
   final AppLocalizations l10n;

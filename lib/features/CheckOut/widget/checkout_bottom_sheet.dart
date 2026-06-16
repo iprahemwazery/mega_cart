@@ -7,7 +7,7 @@ import 'package:mega_cart/features/CheckOut/widget/checkout_header.dart';
 import 'package:mega_cart/features/CheckOut/widget/checkout_summary.dart';
 import 'package:mega_cart/features/CheckOut/widget/handle_bar.dart';
 import 'package:mega_cart/features/CheckOut/view/checkout_action_button.dart';
-import 'package:mega_cart/features/cart/cubit/cart_cubit.dart';
+import 'package:mega_cart/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:mega_cart/features/CheckOut/cubit/checkout_cubit.dart';
 import 'package:mega_cart/features/CheckOut/cubit/checkout_state.dart';
 

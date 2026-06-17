@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:mega_cart/features/cart/presentation/view/cart_view.dart';
 import 'package:mega_cart/features/home/presentation/view/home_view.dart';
 import 'package:mega_cart/features/order/view/orde_view.dart';
-import 'package:mega_cart/features/profile/view/profiel_view.dart';
+import 'package:mega_cart/features/profile/presentation/view/profiel_view.dart';
 import 'package:mega_cart/core/customs/navigation/floating_capsule_nav_bar.dart';
 import 'package:mega_cart/core/animations/page_animation_wrapper.dart';
 

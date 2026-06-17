@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:mega_cart/core/NetWork/failure.dart';
-import 'package:mega_cart/features/profile/widget/user.dart';
-import 'package:mega_cart/features/profile/widget/user_remote_data_source.dart';
-import 'package:mega_cart/features/profile/widget/user_repository.dart';
+import 'package:mega_cart/features/profile/presentation/widget/user.dart';
+import 'package:mega_cart/features/profile/presentation/widget/user_remote_data_source.dart';
+import 'package:mega_cart/features/profile/presentation/widget/user_repository.dart';
 
 class UserRepositoryImpl implements UserRepository {
   final UserRemoteDataSource remoteDataSource;
@@ -14,7 +14,7 @@ class UserRepositoryImpl implements UserRepository {
   Future<Either<Failure, User>> getUserProfile(String userId) async {
     try {
       final userModel = await remoteDataSource.getUserProfile(userId);
-      return Right(userModel);
+      return Right(userModel as User);
     } on DioException catch (e) {
       if (e.response != null && e.response!.data is Map) {
         return Left(

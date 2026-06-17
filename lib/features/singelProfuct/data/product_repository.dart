@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:mega_cart/core/NetWork/api_service.dart';
 import 'package:mega_cart/core/NetWork/failure.dart';
 import 'package:mega_cart/features/home/data/models/product.dart';
-import 'package:mega_cart/core/models/create_product_request.dart';
+import 'package:mega_cart/features/addProduct/data/model/create_product_request.dart';
 import 'package:mega_cart/core/NetWork/product_repository.dart';
 
 class ProductRepositoryImpl implements ProductRepository {

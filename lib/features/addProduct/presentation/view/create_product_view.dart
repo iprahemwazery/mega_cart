@@ -5,6 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:mega_cart/core/NetWork/api_service.dart';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/core/customs/snackbar.dart';
+import 'package:mega_cart/features/addProduct/data/model/add_product_repository_impl.dart';
+import 'package:mega_cart/features/addProduct/doman/add_product_usecase.dart';
+
 import 'package:mega_cart/features/addProduct/presentation/cubit/add_product_cubit.dart';
 import 'package:mega_cart/core/utils/app_text_styles.dart';
 import 'package:mega_cart/features/addProduct/presentation/widget/category_selection_section.dart';
@@ -14,7 +17,6 @@ import 'package:mega_cart/features/addProduct/presentation/widget/create_product
 import 'package:mega_cart/features/addProduct/presentation/widget/image_preview_widget.dart';
 import 'package:mega_cart/features/addProduct/presentation/widget/picture_urls_section.dart';
 import 'package:mega_cart/features/addProduct/presentation/widget/quick_actions_section.dart';
-import 'package:mega_cart/features/singelProfuct/data/product_repository.dart';
 import 'package:mega_cart/features/splashScreen/view/session_manager.dart';
 
 class CreateProductView extends StatefulWidget {
@@ -102,11 +104,14 @@ class _CreateProductViewState extends State<CreateProductView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return BlocProvider(
-      create: (context) => AddProductCubit(
-        ProductRepositoryImpl(
-          ApiService(Dio(BaseOptions(baseUrl: ApiConstans.baseUrl))),
-        ),
-      ),
+      create: (context) {
+        final apiService = ApiService(
+          Dio(BaseOptions(baseUrl: ApiConstans.baseUrl)),
+        );
+        final repository = AddProductRepositoryImpl(apiService);
+        final useCase = AddProductUseCase(repository);
+        return AddProductCubit(useCase);
+      },
       child: Scaffold(
         appBar: AppBar(
           title: Text('createProductTitle'.tr),

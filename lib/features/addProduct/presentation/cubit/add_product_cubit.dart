@@ -1,17 +1,15 @@
 import 'package:bloc/bloc.dart';
-import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:get/get.dart'; // For .tr and GlassSnackbar
-import 'package:mega_cart/core/NetWork/product_repository.dart';
-// import 'package:mega_cart/core/customs/snackbar.dart'; // Removed as GlassSnackbar is used in UI
-import 'package:mega_cart/core/models/create_product_request.dart';
+import 'package:mega_cart/features/addProduct/doman/add_product_usecase.dart';
+import 'package:mega_cart/features/addProduct/data/model/create_product_request.dart';
 
 part 'add_product_state.dart';
 
 class AddProductCubit extends Cubit<AddProductState> {
-  final ProductRepository _productRepository;
+  final AddProductUseCase _addProductUseCase;
 
-  AddProductCubit(this._productRepository) : super(const AddProductInitial());
+  AddProductCubit(this._addProductUseCase) : super(const AddProductInitial());
 
   void addCategory(String categoryId) {
     final updatedList = List<String>.from(state.categoryIds)..add(categoryId);
@@ -101,10 +99,7 @@ class AddProductCubit extends Cubit<AddProductState> {
         productPictureUrls: state.productPictureUrls,
       );
 
-      final result = await _productRepository.createProduct(
-        request,
-        token: token,
-      );
+      final result = await _addProductUseCase.call(request);
 
       result.fold((failure) {
         emit(AddProductError(failure.toString()));

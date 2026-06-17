@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/features/home/data/models/product.dart';
-import 'package:mega_cart/core/models/create_product_request.dart';
+import 'package:mega_cart/features/addProduct/data/model/create_product_request.dart';
 
 class ProductService {
   final Dio _dio;

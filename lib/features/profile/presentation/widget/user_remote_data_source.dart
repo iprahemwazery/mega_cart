@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/features/splashScreen/view/session_manager.dart';
-import 'package:mega_cart/core/models/user_model.dart';
+import 'package:mega_cart/features/profile/data/user_model.dart';
 
 abstract class UserRemoteDataSource {
   Future<UserModel> getUserProfile(String userId);

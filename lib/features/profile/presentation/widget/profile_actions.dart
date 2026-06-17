@@ -4,10 +4,10 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:mega_cart/core/animations/page_animation_wrapper.dart';
 import 'package:mega_cart/core/customs/snackbar.dart';
 import 'package:mega_cart/core/app_router.dart';
-import 'package:mega_cart/features/profile/data/profile_conttroller.dart';
+import 'package:mega_cart/features/profile/damain/profile_conttroller.dart';
 import 'package:mega_cart/features/settings/widget/settings_controller.dart';
 import 'package:mega_cart/features/settings/view/sttings_view.dart';
-import 'package:mega_cart/features/profile/widget/profile_action_card.dart';
+import 'package:mega_cart/features/profile/presentation/widget/profile_action_card.dart';
 
 class ProfileActions extends StatelessWidget {
   const ProfileActions({super.key});

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:mega_cart/features/addProduct/doman/add_product_usecase.dart'; // Keep this for now, but note it should be domain/usecases
 import 'package:mega_cart/features/addProduct/presentation/cubit/add_product_cubit.dart';
 import 'package:mega_cart/features/addProduct/presentation/widget/add_product_authentication_section.dart';
 import 'package:mega_cart/features/addProduct/presentation/widget/add_product_details_section.dart';
@@ -11,7 +12,7 @@ import 'package:mega_cart/features/addProduct/presentation/widget/add_product_su
 import 'package:mega_cart/features/addProduct/presentation/widget/add_product_text_field.dart';
 import 'package:mega_cart/core/customs/snackbar.dart';
 import 'package:mega_cart/core/NetWork/api_service.dart';
-
+import 'package:mega_cart/features/addProduct/doman/add_product_repository_impl.dart'; // Use the AddProductRepositoryImpl from 'doman' for now
 import 'package:mega_cart/features/splashScreen/view/session_manager.dart';
 import 'package:mega_cart/features/singelProfuct/data/product_repository.dart';
 
@@ -103,8 +104,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
         final apiService = ApiService(
           dio,
         ); // Token will be passed directly to cubit
-        final productRepository = ProductRepositoryImpl(apiService);
-        return AddProductCubit(productRepository);
+        final addProductRepository = AddProductRepositoryImpl(
+          apiService,
+        ); // Use the correct AddProductRepositoryImpl
+        final addProductUseCase = AddProductUseCase(addProductRepository);
+        return AddProductCubit(addProductUseCase);
       },
       child: Scaffold(
         appBar: AppBar(title: const Text('إضافة منتج جديد'), centerTitle: true),

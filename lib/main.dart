@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/core/app_router.dart';
+import 'package:mega_cart/core/service_locator.dart';
 import 'package:mega_cart/core/language_service.dart';
 import 'package:mega_cart/core/theme_service.dart';
 import 'package:mega_cart/features/CheckOut/cubit/checkout_cubit.dart';
@@ -16,9 +17,7 @@ import 'package:mega_cart/features/home/data/home_repository_impl.dart';
 import 'package:mega_cart/features/home/domain/get_products_use_case.dart';
 import 'package:mega_cart/features/home/presentation/cubit/category/category_cubit.dart';
 import 'package:mega_cart/features/order/cubit/order_cubit.dart';
-import 'package:mega_cart/features/profile/cubit/profile_cubit.dart';
-import 'package:mega_cart/features/profile/widget/user_remote_data_source.dart';
-import 'package:mega_cart/features/profile/widget/user_repository_impl.dart';
+import 'package:mega_cart/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:mega_cart/core/NetWork/product_repository.dart'
     as core_product_repo; // Alias to avoid conflict
 import 'package:mega_cart/features/singelProfuct/data/product_repository.dart';
@@ -37,6 +36,7 @@ import 'package:mega_cart/core/l10n/app_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  await setupServiceLocator(); // Initialize GetIt
   runApp(const MyApp());
 }
 
@@ -56,6 +56,11 @@ class MyApp extends StatelessWidget {
     Get.put(dio);
     final apiService = ApiService(dio);
     Get.put(apiService);
+
+    // Register core services in GetIt if they aren't already
+    if (!sl.isRegistered<ApiService>()) {
+      sl.registerLazySingleton<ApiService>(() => apiService);
+    }
 
     return MultiBlocProvider(
       providers: [
@@ -92,8 +97,9 @@ class MyApp extends StatelessWidget {
 
         //profile
         BlocProvider(
-          create: (context) =>
-              ProfileCubit(UserRepositoryImpl(UserRemoteDataSourceImpl(dio))),
+          // Now we use sl() to get the Cubit automatically
+          // including all its dependencies (UseCase -> Repository)
+          create: (context) => sl<ProfileCubit>(),
         ),
 
         //checkout

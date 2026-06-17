@@ -2,17 +2,15 @@ import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:mega_cart/core/NetWork/api_constans.dart';
 import 'package:mega_cart/features/home/data/models/product.dart';
-import 'package:mega_cart/core/models/create_product_request.dart';
+import 'package:mega_cart/features/addProduct/data/model/create_product_request.dart';
 import 'package:mega_cart/core/NetWork/error_interceptor.dart';
+import 'package:mega_cart/core/NetWork/auth_interceptor.dart';
 
 class ApiService {
   final Dio dio;
-  final String? token;
 
-  ApiService(this.dio, {this.token}) {
-    if (token != null) {
-      dio.options.headers['Authorization'] = 'Bearer $token';
-    }
+  ApiService(this.dio) {
+    dio.interceptors.add(AuthInterceptor());
     dio.interceptors.add(ErrorInterceptor());
   }
 

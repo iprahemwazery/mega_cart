@@ -81,6 +81,9 @@ class HomeCubit extends Cubit<HomeState> {
         },
         (productResponse) {
           List<Product> newProducts = productResponse.items.cast<Product>();
+          debugPrint(
+            'loadProducts - Success: fetched ${newProducts.length} items',
+          );
 
           if (query == null) {
             final List<Product> updatedAllProducts = loadMore

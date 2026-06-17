@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:dio/dio.dart';
-import 'package:mega_cart/features/profile/cubit/profile_cubit.dart';
-import 'package:mega_cart/features/profile/cubit/profile_state.dart';
-import 'package:mega_cart/features/profile/widget/user_remote_data_source.dart';
-import 'package:mega_cart/features/profile/widget/user_repository_impl.dart';
-import 'package:mega_cart/features/profile/widget/profile_header.dart';
-import 'package:mega_cart/features/profile/widget/profile_actions.dart';
+import 'package:mega_cart/core/service_locator.dart';
+import 'package:mega_cart/features/profile/presentation/cubit/profile_cubit.dart'; // Corrected import
+
+import 'package:mega_cart/features/profile/presentation/widget/profile_header.dart';
+import 'package:mega_cart/features/profile/presentation/widget/profile_actions.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -17,21 +15,17 @@ class ProfileView extends StatelessWidget {
   Widget build(BuildContext context) {
     // For demonstration, we'll use a hardcoded user ID.
     // In a real app, this would come from authentication.
-    const String userId = 'user123';
 
     return BlocProvider(
-      create: (context) {
-        final remoteDataSource = UserRemoteDataSourceImpl(Get.find<Dio>());
-        final userRepository = UserRepositoryImpl(remoteDataSource);
-        return ProfileCubit(userRepository)..loadUserProfile(userId);
-      },
+      // Use sl to inject the Cubit with all its hierarchy
+      create: (context) => sl<ProfileCubit>()..fetchProfile(),
       child: Scaffold(
         appBar: AppBar(title: Text('profile'.tr), centerTitle: true),
         body: BlocBuilder<ProfileCubit, ProfileState>(
           builder: (context, state) {
             if (state is ProfileLoading) {
               return const Center(child: CircularProgressIndicator());
-            } else if (state is ProfileLoaded) {
+            } else if (state is ProfileSuccess) {
               final user = state.user;
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -69,7 +63,8 @@ class ProfileView extends StatelessWidget {
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
-                        context.read<ProfileCubit>().loadUserProfile(userId);
+                        // Call fetchProfile
+                        context.read<ProfileCubit>().fetchProfile();
                       },
                       child: Text('retry'.tr),
                     ),

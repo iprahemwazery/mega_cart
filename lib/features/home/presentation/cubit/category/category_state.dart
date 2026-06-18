@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:mega_cart/features/home/data/models/category.dart';
+import 'package:mega_cart/features/home/data/category/models/category.dart';
 
 enum CategoryStatus { initial, loading, success, failure }
 

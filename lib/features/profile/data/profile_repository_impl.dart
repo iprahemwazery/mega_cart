@@ -4,7 +4,6 @@ import 'package:mega_cart/core/NetWork/api_service.dart';
 import 'package:mega_cart/core/NetWork/failure.dart';
 import 'package:mega_cart/features/profile/damain/profile_repository.dart';
 import 'package:mega_cart/features/profile/data/user_model.dart';
-import 'package:mega_cart/features/profile/damain/profile_repository.dart';
 import 'package:mega_cart/features/profile/damain/user_entity.dart'; // Corrected import
 
 class ProfileRepositoryImpl implements ProfileRepository {

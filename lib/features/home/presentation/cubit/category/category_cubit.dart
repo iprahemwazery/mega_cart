@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mega_cart/features/home/presentation/cubit/category/category_state.dart';
-import 'package:mega_cart/features/home/data/models/category.dart';
+import 'package:mega_cart/features/home/data/category/models/category.dart';
 
 class CategoryCubit extends Cubit<CategoryState> {
   CategoryCubit() : super(const CategoryState());

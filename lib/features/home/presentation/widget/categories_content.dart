@@ -33,7 +33,7 @@ class CategoriesContent extends StatelessWidget {
                   color: Colors.grey,
                 ),
                 const SizedBox(height: 16),
-                Text(categoryState?.errorMessage ?? 'fetchError'.tr),
+                Text(categoryState.errorMessage ?? 'fetchError'.tr),
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: () =>
@@ -86,7 +86,7 @@ class CategorySkeleton extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: Colors.white.withOpacity(0.2), // تأثير بسيط يشبه اللمعان
+          color: Colors.white.withOpacity(0.2),
         ),
       ),
     );

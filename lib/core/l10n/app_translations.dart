@@ -161,6 +161,7 @@ class AppTranslations extends Translations {
       'enterPriceError': 'Please enter price',
       'enterStockError': 'Please enter stock',
       'enterSellerIdError': 'Please enter seller ID',
+      // ignore: equal_keys_in_map
       'enterSellerIdError': 'Please enter seller ID',
       'currency': 'Currency',
       'changeCurrency': 'Change Currency',

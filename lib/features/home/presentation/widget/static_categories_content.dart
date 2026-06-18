@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:mega_cart/features/home/data/models/category.dart';
+import 'package:mega_cart/features/home/data/category/models/category.dart';
 
 class StaticCategoriesContent extends StatelessWidget {
   const StaticCategoriesContent({super.key});

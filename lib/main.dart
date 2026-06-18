@@ -18,8 +18,6 @@ import 'package:mega_cart/features/home/domain/get_products_use_case.dart';
 import 'package:mega_cart/features/home/presentation/cubit/category/category_cubit.dart';
 import 'package:mega_cart/features/order/cubit/order_cubit.dart';
 import 'package:mega_cart/features/profile/presentation/cubit/profile_cubit.dart';
-import 'package:mega_cart/core/NetWork/product_repository.dart'
-    as core_product_repo; // Alias to avoid conflict
 import 'package:mega_cart/features/singelProfuct/data/product_repository.dart';
 import 'package:mega_cart/core/NetWork/api_service.dart';
 import 'package:mega_cart/features/home/presentation/cubit/home/home_cubit.dart';
@@ -36,7 +34,7 @@ import 'package:mega_cart/core/l10n/app_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  await setupServiceLocator(); // Initialize GetIt
+  await setupServiceLocator();
   runApp(const MyApp());
 }
 
@@ -65,6 +63,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         //auth
+
         //Login
         BlocProvider(create: (context) => LoginCubit(AuthRepositoryImpl(dio))),
         //Signup
@@ -96,11 +95,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => FavoritesCubit()),
 
         //profile
-        BlocProvider(
-          // Now we use sl() to get the Cubit automatically
-          // including all its dependencies (UseCase -> Repository)
-          create: (context) => sl<ProfileCubit>(),
-        ),
+        BlocProvider(create: (context) => sl<ProfileCubit>()),
 
         //checkout
         BlocProvider(

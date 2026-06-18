@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:mega_cart/core/models/category_model.dart';
+import 'package:mega_cart/features/home/data/category/models/category_model.dart';
 
 class CategoryGridItem extends StatelessWidget {
   final CategoryModel category;

@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
-import 'package:mega_cart/features/addProduct/doman/add_product_usecase.dart'; // Keep this for now, but note it should be domain/usecases
+import 'package:mega_cart/features/addProduct/doman/add_product_usecase.dart';
 import 'package:mega_cart/features/addProduct/presentation/cubit/add_product_cubit.dart';
 import 'package:mega_cart/features/addProduct/presentation/widget/add_product_authentication_section.dart';
 import 'package:mega_cart/features/addProduct/presentation/widget/add_product_details_section.dart';
@@ -12,9 +12,8 @@ import 'package:mega_cart/features/addProduct/presentation/widget/add_product_su
 import 'package:mega_cart/features/addProduct/presentation/widget/add_product_text_field.dart';
 import 'package:mega_cart/core/customs/snackbar.dart';
 import 'package:mega_cart/core/NetWork/api_service.dart';
-import 'package:mega_cart/features/addProduct/doman/add_product_repository_impl.dart'; // Use the AddProductRepositoryImpl from 'doman' for now
+import 'package:mega_cart/features/addProduct/doman/add_product_repository_impl.dart';
 import 'package:mega_cart/features/splashScreen/view/session_manager.dart';
-import 'package:mega_cart/features/singelProfuct/data/product_repository.dart';
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({super.key});
@@ -96,17 +95,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) {
-        // Initialize Dio and ApiService here or inject them
-        // For simplicity, re-initializing here. In a real app, use dependency injection.
         final dio = Dio(
           BaseOptions(baseUrl: 'https://accessories-eshop.runasp.net/api/'),
         );
-        final apiService = ApiService(
-          dio,
-        ); // Token will be passed directly to cubit
-        final addProductRepository = AddProductRepositoryImpl(
-          apiService,
-        ); // Use the correct AddProductRepositoryImpl
+        final apiService = ApiService(dio);
+        final addProductRepository = AddProductRepositoryImpl(apiService);
         final addProductUseCase = AddProductUseCase(addProductRepository);
         return AddProductCubit(addProductUseCase);
       },
@@ -130,7 +123,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
               child: Form(
                 key: _formKey,
                 child: Column(
-                  // Changed to Column to hold multiple sections
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     AddProductAuthenticationSection(

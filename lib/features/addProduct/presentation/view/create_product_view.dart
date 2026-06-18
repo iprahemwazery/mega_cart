@@ -20,7 +20,6 @@ import 'package:mega_cart/features/addProduct/presentation/widget/quick_actions_
 import 'package:mega_cart/features/splashScreen/view/session_manager.dart';
 
 class CreateProductView extends StatefulWidget {
-  // Renamed from AddProductScreen to CreateProductView as per user's current file
   const CreateProductView({super.key});
 
   @override

@@ -226,13 +226,14 @@ class _LanguageSection extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _AccountSection extends StatelessWidget {
   final AppLocalizations l10n;
   const _AccountSection({required this.l10n});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

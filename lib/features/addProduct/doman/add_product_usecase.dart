@@ -3,7 +3,6 @@ import 'package:mega_cart/core/NetWork/failure.dart';
 import 'package:mega_cart/features/addProduct/data/model/add_product_repository.dart';
 import 'package:mega_cart/features/addProduct/data/model/create_product_request.dart';
 
-// This file is already in the correct domain/usecases structure.
 class AddProductUseCase {
   final AddProductRepository repository;
 

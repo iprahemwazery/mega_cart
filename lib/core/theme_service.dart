@@ -5,7 +5,6 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ThemeService {
-  // تحويل الكلاس إلى Singleton لضمان استقرار الأداء
   static final ThemeService _instance = ThemeService._internal();
   factory ThemeService() => _instance;
   ThemeService._internal();
@@ -65,7 +64,6 @@ class ThemeService {
     textTheme: _buildTextTheme(Brightness.light),
   );
 
-  // استخدام FlexColorScheme للثيم الغامق
   static final darkTheme = FlexThemeData.dark(
     scheme: FlexScheme.blue,
     surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,

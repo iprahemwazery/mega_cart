@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:mega_cart/core/l10n/app_localizations.dart';
 import 'package:mega_cart/features/settings/widget/icon_container.dart';
 import 'package:mega_cart/features/settings/widget/settings_controller.dart';
